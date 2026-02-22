@@ -3,68 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OLX Premium & Profile</title>
+    <title>OLX Community</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --olx-green: #407c3c;
-            --olx-light-green: #f2f7f2;
             --tg-bg: var(--tg-theme-bg-color, #ffffff);
             --tg-text: var(--tg-theme-text-color, #222222);
-            --tg-hint: var(--tg-theme-hint-color, #999999);
             --tg-sec-bg: var(--tg-theme-secondary-bg-color, #f0f0f2);
         }
 
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #fdfdfd; color: var(--tg-text); margin: 0; padding-bottom: 110px; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: #fdfdfd; color: var(--tg-text); margin: 0; padding-bottom: 110px; }
 
-        /* Вкладки */
-        .page { display: none; animation: slideUp 0.4s ease; }
+        .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Пошук та Фільтри */
-        .header { background: white; padding: 15px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .search-container { position: relative; display: flex; align-items: center; background: #fff; border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 8px 12px; }
-        .search-container input { border: none; outline: none; background: transparent; width: 100%; font-size: 16px; margin-left: 10px; color: var(--tg-text); }
-        
-        .tools { display: flex; justify-content: space-between; margin-top: 15px; gap: 10px; }
-        .btn-tool { flex: 1; background: #fff; border: 1.5px solid #e0e0e0; padding: 8px; border-radius: 12px; font-weight: 600; color: var(--olx-green); display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: 0.2s; }
+        /* Шапка та Пошук */
+        .header { background: white; padding: 15px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #eee; }
+        .search-container { display: flex; align-items: center; background: var(--tg-sec-bg); border-radius: 10px; padding: 10px; }
+        .search-container input { border: none; background: transparent; width: 100%; margin: 0 10px; outline: none; font-size: 16px; }
 
-        /* Сітка товарів */
-        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        .product-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; transition: 0.3s; }
-        .product-card img { width: 100%; height: 130px; object-fit: cover; }
-        .product-info { padding: 12px; }
-        .product-title { font-size: 14px; font-weight: 600; color: #333; height: 38px; overflow: hidden; margin-bottom: 5px; }
-        .product-price { color: var(--olx-green); font-weight: 800; font-size: 16px; }
+        .filter-row { display: flex; gap: 10px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-chip { padding: 6px 15px; border-radius: 20px; border: 1px solid #ddd; font-size: 13px; white-space: nowrap; cursor: pointer; }
+        .filter-chip.active { background: var(--olx-green); color: white; border-color: var(--olx-green); }
 
-        /* Профіль */
-        .profile-card { background: white; margin: 15px; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #f0f0f0; }
-        .avatar-container { position: relative; width: 110px; height: 110px; margin: 0 auto 15px; }
-        .avatar-preview { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--olx-green); background: var(--tg-sec-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
-        .avatar-preview i { font-size: 40px; color: var(--olx-green); }
-        .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
-        .edit-icon { position: absolute; bottom: 5px; right: 5px; background: var(--olx-green); color: white; width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        /* Форма додавання */
+        .add-form { padding: 20px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        .input-group input, .input-group select, .input-group textarea { 
+            width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #ddd; box-sizing: border-box; font-size: 16px;
+        }
+        .btn-publish { width: 100%; background: var(--olx-green); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
 
-        .stats-box { display: flex; justify-content: space-around; background: white; margin: 0 15px 15px; padding: 15px; border-radius: 15px; border: 1px solid #eee; }
-        .stat-item { text-align: center; }
-        .stat-val { display: block; font-weight: 800; font-size: 18px; color: var(--olx-green); }
-        .stat-label { font-size: 11px; color: #888; text-transform: uppercase; }
+        /* Картки */
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .product-card { background: white; border-radius: 15px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .product-card img { width: 100%; height: 120px; object-fit: cover; }
+        .product-info { padding: 10px; }
+        .price { color: var(--olx-green); font-weight: 800; font-size: 16px; }
 
-        /* Стан "Немає товарів" */
-        .empty-state { display: none; text-align: center; padding: 40px 20px; }
-        .empty-box { background: white; border-radius: 25px; padding: 15px 30px; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); border: 1px solid #eee; }
+        /* Стан "Порожньо" */
+        .empty { text-align: center; padding: 50px 20px; color: #888; }
+        .empty i { font-size: 50px; margin-bottom: 15px; color: #ddd; }
 
         /* Навігація */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 85px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; z-index: 2000; }
-        .nav-item { text-align: center; color: var(--olx-green); font-size: 12px; font-weight: 600; flex: 1; cursor: pointer; opacity: 0.6; }
-        .nav-item.active { opacity: 1; }
-        .nav-item i { font-size: 26px; display: block; margin-bottom: 4px; }
-        
-        .main-add-btn { width: 70px; height: 70px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-top: -50px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 4px solid #fdfdfd; cursor: pointer; }
-        .circle-plus { width: 55px; height: 55px; background: var(--olx-green); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 30px; }
-
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; }
+        .nav-item { text-align: center; color: var(--olx-green); font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 2px; }
+        .nav-item.active { color: #1a3d1a; }
+        .plus-btn { width: 55px; height: 55px; background: var(--olx-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; margin-top: -35px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -72,145 +62,145 @@
     <div id="home-page" class="page active">
         <div class="header">
             <div class="search-container">
-                <i class="fa fa-search" style="color: var(--olx-green);"></i>
-                <input type="text" id="searchInput" placeholder="Пошук товарів...">
-                <i class="fa fa-microphone" style="color: var(--olx-green);"></i>
+                <i class="fa fa-search" style="color: var(--olx-green)"></i>
+                <input type="text" id="searchInput" placeholder="Пошук...">
             </div>
-            <div class="tools">
-                <div class="btn-tool"><i class="fa fa-filter"></i> Фільтри</div>
-                <div class="btn-tool" onclick="window.location.reload()"><i class="fa fa-sync"></i> Оновити</div>
+            <div class="filter-row">
+                <div class="filter-chip active" onclick="filterCat('Всі', this)">Всі</div>
+                <div class="filter-chip" onclick="filterCat('Нерухомість', this)">Нерухомість</div>
+                <div class="filter-chip" onclick="filterCat('Авто', this)">Авто</div>
+                <div class="filter-chip" onclick="filterCat('Електроніка', this)">Електроніка</div>
             </div>
         </div>
-
         <div id="productGrid" class="products-grid"></div>
-
-        <div id="emptyMsg" class="empty-state">
-            <div class="empty-box">
-                <i class="fa-regular fa-face-frown" style="color: var(--olx-green); font-size: 20px;"></i>
-                <span>ТОВАРІВ ПОКИ ЩО НЕМАЄ</span>
-            </div>
+        <div id="emptyState" class="empty">
+            <i class="fa-regular fa-face-frown"></i>
+            <p>ТОВАРІВ ПОКИ ЩО НЕМАЄ</p>
         </div>
     </div>
 
-    <div id="profile-page" class="page">
-        <div class="profile-card">
-            <div class="avatar-container" onclick="document.getElementById('fileInput').click()">
-                <div class="avatar-preview" id="avatarPreview">
-                    <i class="fa fa-camera"></i>
-                </div>
-                <div class="edit-icon"><i class="fa fa-pencil"></i></div>
+    <div id="add-page" class="page">
+        <div class="add-form">
+            <h2>Виставити товар</h2>
+            <div class="input-group">
+                <label>Фото товару</label>
+                <input type="file" id="itemPhoto" accept="image/*">
             </div>
-            <input type="file" id="fileInput" hidden accept="image/*" onchange="loadAvatar(this)">
-            
-            <h3 id="userName" style="margin: 10px 0 5px 0;">Користувач</h3>
-            <p id="userTag" style="color: var(--tg-hint); margin: 0 0 15px 0;">@username</p>
-            <button class="btn-tool" style="max-width: 200px; margin: 0 auto;">Редагувати профіль <i class="fa fa-chevron-right" style="font-size: 10px; margin-left: 5px;"></i></button>
-        </div>
-
-        <div class="stats-box">
-            <div class="stat-item"><span class="stat-val">12</span><span class="stat-label">Товари</span></div>
-            <div class="stat-item"><span class="stat-val">5</span><span class="stat-label">Продано</span></div>
-            <div class="stat-item"><span class="stat-val">⭐ 6.8</span><span class="stat-label">Рейтинг</span></div>
-        </div>
-
-        <h3 style="margin: 20px 0 10px 15px; font-size: 18px;">Мої товари</h3>
-        <div class="products-grid" id="myProductsGrid">
+            <div class="input-group">
+                <label>Назва</label>
+                <input type="text" id="itemName" placeholder="Наприклад: iPhone 13">
             </div>
+            <div class="input-group">
+                <label>Ціна (грн)</label>
+                <input type="number" id="itemPrice" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label>Категорія</label>
+                <select id="itemCat">
+                    <option>Нерухомість</option>
+                    <option>Авто</option>
+                    <option>Електроніка</option>
+                </select>
+            </div>
+            <button class="btn-publish" onclick="publishItem()">Опублікувати</button>
+        </div>
+    </div>
+
+    <div id="profile-page" class="page" style="text-align:center; padding: 40px 20px;">
+        <i class="fa fa-user-circle" style="font-size: 80px; color: var(--olx-green)"></i>
+        <h2 id="uName">Вітаємо!</h2>
+        <p>Ваші активні оголошення будуть тут.</p>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" id="nav-home" onclick="changeTab('home-page', this)">
-            <i class="fa fa-home"></i>
-            Головна
-        </div>
-        <div class="main-add-btn">
-            <div class="circle-plus"><i class="fa fa-plus"></i></div>
-        </div>
-        <div class="nav-item" id="nav-profile" onclick="changeTab('profile-page', this)">
-            <i class="fa fa-user"></i>
-            Профіль
-        </div>
+        <div class="nav-item active" onclick="showTab('home-page', this)"><i class="fa fa-home"></i>Головна</div>
+        <div class="plus-btn" onclick="showTab('add-page', this)"><i class="fa fa-plus"></i></div>
+        <div class="nav-item" onclick="showTab('profile-page', this)"><i class="fa fa-user"></i>Профіль</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+        
+        let allProducts = []; // Початково порожньо
+        let currentFilter = 'Всі';
 
-        const products = [
-            { title: "Нові Кросівки", price: "1 200 грн", img: "https://picsum.photos/300/300?1" },
-            { title: "Ноутбук ASUS", price: "15 500 грн", img: "https://picsum.photos/300/300?2" },
-            { title: "Жіноча Сумка", price: "850 грн", img: "https://picsum.photos/300/300?3" },
-            { title: "Ігрова Консоль", price: "8 000 грн", img: "https://picsum.photos/300/300?4" },
-            { title: "Годинник", price: "2 300 грн", img: "https://picsum.photos/300/300?5" },
-            { title: "Фотоапарат Canon", price: "10 000 грн", img: "https://picsum.photos/300/300?6" }
-        ];
-
-        function renderProducts(list, gridId) {
-            const grid = document.getElementById(gridId);
-            const empty = document.getElementById('emptyMsg');
+        function showTab(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(el.classList.contains('nav-item')) el.classList.add('active');
             
-            if (list.length === 0 && gridId === 'productGrid') {
+            if(id !== 'home-page') tg.BackButton.show(); else tg.BackButton.hide();
+        }
+
+        tg.BackButton.onClick(() => showTab('home-page', document.querySelector('.nav-item')));
+
+        function publishItem() {
+            const name = document.getElementById('itemName').value;
+            const price = document.getElementById('itemPrice').value;
+            const cat = document.getElementById('itemCat').value;
+            const photoInput = document.getElementById('itemPhoto');
+
+            if(!name || !price) { tg.showAlert("Заповніть назву та ціну!"); return; }
+
+            const newItem = {
+                id: Date.now(),
+                title: name,
+                price: price + " грн",
+                category: cat,
+                img: "https://picsum.photos/300/300?random=" + Math.random() // Тимчасово випадкове фото
+            };
+
+            allProducts.unshift(newItem); // Додаємо на початок
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("Товар успішно додано!");
+            
+            // Очищуємо поля та повертаємось на головну
+            document.getElementById('itemName').value = "";
+            document.getElementById('itemPrice').value = "";
+            showTab('home-page', document.querySelector('.nav-item'));
+            render();
+        }
+
+        function render() {
+            const grid = document.getElementById('productGrid');
+            const empty = document.getElementById('emptyState');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = allProducts;
+            if(currentFilter !== 'Всі') filtered = filtered.filter(p => p.category === currentFilter);
+            if(searchVal) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchVal));
+
+            if(filtered.length === 0) {
                 grid.style.display = 'none';
                 empty.style.display = 'block';
             } else {
-                if (gridId === 'productGrid') {
-                    grid.style.display = 'grid';
-                    empty.style.display = 'none';
-                }
-                grid.innerHTML = list.map(p => `
+                grid.style.display = 'grid';
+                empty.style.display = 'none';
+                grid.innerHTML = filtered.map(p => `
                     <div class="product-card">
                         <img src="${p.img}">
                         <div class="product-info">
-                            <div class="product-title">${p.title}</div>
-                            <div class="product-price">${p.price}</div>
+                            <div style="font-size:14px; font-weight:600">${p.title}</div>
+                            <div class="price">${p.price}</div>
                         </div>
                     </div>
                 `).join('');
             }
         }
 
-        function changeTab(pageId, el) {
-            tg.HapticFeedback.impactOccurred('medium');
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            
-            document.getElementById(pageId).classList.add('active');
+        function filterCat(cat, el) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-
-            // Кнопка Назад у Telegram
-            if(pageId === 'profile-page') tg.BackButton.show(); else tg.BackButton.hide();
+            currentFilter = cat;
+            render();
         }
 
-        tg.BackButton.onClick(() => {
-            changeTab('home-page', document.getElementById('nav-home'));
-        });
+        document.getElementById('searchInput').oninput = render;
 
-        function loadAvatar(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('avatarPreview').innerHTML = `<img src="${e.target.result}">`;
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // Пошук
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            const filtered = products.filter(p => p.title.toLowerCase().includes(val));
-            renderProducts(filtered, 'productGrid');
-        });
-
-        // Ініціалізація даних користувача
-        if (tg.initDataUnsafe?.user) {
-            document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
-            document.getElementById('userTag').innerText = "@" + (tg.initDataUnsafe.user.username || "user");
-        }
-
-        // Запуск
-        renderProducts(products, 'productGrid');
-        renderProducts(products.slice(0, 2), 'myProductsGrid'); // Для прикладу в профілі
+        if(tg.initDataUnsafe?.user) document.getElementById('uName').innerText = tg.initDataUnsafe.user.first_name;
+        render(); // Перший запуск
     </script>
 </body>
 </html>
