@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OLX Community</title>
+    <title>OLX Community Fix</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -20,50 +20,55 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Шапка та Пошук */
+        /* Шапка */
         .header { background: white; padding: 15px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #eee; }
-        .search-container { display: flex; align-items: center; background: var(--tg-sec-bg); border-radius: 10px; padding: 10px; }
-        .search-container input { border: none; background: transparent; width: 100%; margin: 0 10px; outline: none; font-size: 16px; }
+        .header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .search-container { flex-grow: 1; display: flex; align-items: center; background: var(--tg-sec-bg); border-radius: 10px; padding: 8px 12px; }
+        .search-container input { border: none; background: transparent; width: 100%; outline: none; font-size: 16px; margin-left: 8px; }
+        
+        /* Кнопка налаштувань */
+        .settings-btn { background: none; border: none; font-size: 22px; color: var(--olx-green); cursor: pointer; padding: 5px; }
 
-        .filter-row { display: flex; gap: 10px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-row { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; }
         .filter-chip { padding: 6px 15px; border-radius: 20px; border: 1px solid #ddd; font-size: 13px; white-space: nowrap; cursor: pointer; }
         .filter-chip.active { background: var(--olx-green); color: white; border-color: var(--olx-green); }
+
+        /* Картки товарів */
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .product-card { background: white; border-radius: 15px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .product-card img { width: 100%; height: 120px; object-fit: cover; background: #eee; }
+        .product-info { padding: 10px; }
+        .price { color: var(--olx-green); font-weight: 800; font-size: 16px; }
 
         /* Форма додавання */
         .add-form { padding: 20px; }
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        .input-group input, .input-group select, .input-group textarea { 
-            width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #ddd; box-sizing: border-box; font-size: 16px;
-        }
-        .btn-publish { width: 100%; background: var(--olx-green); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
-
-        /* Картки */
-        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .product-card { background: white; border-radius: 15px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .product-card img { width: 100%; height: 120px; object-fit: cover; }
-        .product-info { padding: 10px; }
-        .price { color: var(--olx-green); font-weight: 800; font-size: 16px; }
-
-        /* Стан "Порожньо" */
-        .empty { text-align: center; padding: 50px 20px; color: #888; }
-        .empty i { font-size: 50px; margin-bottom: 15px; color: #ddd; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #ddd; box-sizing: border-box; }
+        .btn-publish { width: 100%; background: var(--olx-green); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; }
 
         /* Навігація */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; }
-        .nav-item { text-align: center; color: var(--olx-green); font-size: 11px; font-weight: 600; flex: 1; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { text-align: center; color: var(--olx-green); font-size: 11px; font-weight: 600; flex: 1; opacity: 0.5; cursor: pointer; }
+        .nav-item.active { opacity: 1; }
         .nav-item i { font-size: 22px; display: block; margin-bottom: 2px; }
-        .nav-item.active { color: #1a3d1a; }
-        .plus-btn { width: 55px; height: 55px; background: var(--olx-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; margin-top: -35px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .plus-btn { width: 55px; height: 55px; background: var(--olx-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; margin-top: -35px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 4px solid white; }
+
+        .empty { text-align: center; padding: 50px 20px; color: #888; display: none; }
     </style>
 </head>
 <body>
 
     <div id="home-page" class="page active">
         <div class="header">
-            <div class="search-container">
-                <i class="fa fa-search" style="color: var(--olx-green)"></i>
-                <input type="text" id="searchInput" placeholder="Пошук...">
+            <div class="header-top">
+                <div class="search-container">
+                    <i class="fa fa-search" style="color: var(--olx-green)"></i>
+                    <input type="text" id="searchInput" placeholder="Пошук...">
+                </div>
+                <button class="settings-btn" onclick="tg.showAlert('Налаштування в розробці')">
+                    <i class="fa fa-cog"></i>
+                </button>
             </div>
             <div class="filter-row">
                 <div class="filter-chip active" onclick="filterCat('Всі', this)">Всі</div>
@@ -74,7 +79,7 @@
         </div>
         <div id="productGrid" class="products-grid"></div>
         <div id="emptyState" class="empty">
-            <i class="fa-regular fa-face-frown"></i>
+            <i class="fa-regular fa-face-frown" style="font-size: 50px; display: block; margin-bottom: 10px;"></i>
             <p>ТОВАРІВ ПОКИ ЩО НЕМАЄ</p>
         </div>
     </div>
@@ -109,32 +114,34 @@
     <div id="profile-page" class="page" style="text-align:center; padding: 40px 20px;">
         <i class="fa fa-user-circle" style="font-size: 80px; color: var(--olx-green)"></i>
         <h2 id="uName">Вітаємо!</h2>
-        <p>Ваші активні оголошення будуть тут.</p>
+        <p>Ваші оголошення з'являться тут після публікації.</p>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="showTab('home-page', this)"><i class="fa fa-home"></i>Головна</div>
+        <div class="nav-item active" id="btn-home" onclick="showTab('home-page', this)"><i class="fa fa-home"></i>Головна</div>
         <div class="plus-btn" onclick="showTab('add-page', this)"><i class="fa fa-plus"></i></div>
-        <div class="nav-item" onclick="showTab('profile-page', this)"><i class="fa fa-user"></i>Профіль</div>
+        <div class="nav-item" id="btn-profile" onclick="showTab('profile-page', this)"><i class="fa fa-user"></i>Профіль</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         
-        let allProducts = []; // Початково порожньо
+        let allProducts = [];
         let currentFilter = 'Всі';
 
         function showTab(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(el.classList.contains('nav-item')) el.classList.add('active');
+            
+            // Якщо натиснули на Плюс, не підсвічуємо іконки Головна/Профіль
+            if(el && el.classList.contains('nav-item')) el.classList.add('active');
             
             if(id !== 'home-page') tg.BackButton.show(); else tg.BackButton.hide();
         }
 
-        tg.BackButton.onClick(() => showTab('home-page', document.querySelector('.nav-item')));
+        tg.BackButton.onClick(() => showTab('home-page', document.getElementById('btn-home')));
 
         function publishItem() {
             const name = document.getElementById('itemName').value;
@@ -142,25 +149,41 @@
             const cat = document.getElementById('itemCat').value;
             const photoInput = document.getElementById('itemPhoto');
 
-            if(!name || !price) { tg.showAlert("Заповніть назву та ціну!"); return; }
+            if(!name || !price) {
+                tg.showAlert("Будь ласка, заповніть назву та ціну!");
+                return;
+            }
 
-            const newItem = {
-                id: Date.now(),
-                title: name,
-                price: price + " грн",
-                category: cat,
-                img: "https://picsum.photos/300/300?random=" + Math.random() // Тимчасово випадкове фото
+            const file = photoInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const newItem = {
+                    id: Date.now(),
+                    title: name,
+                    price: price + " грн",
+                    category: cat,
+                    img: e.target.result // Тут тепер справжнє фото!
+                };
+
+                allProducts.unshift(newItem);
+                tg.HapticFeedback.notificationOccurred('success');
+                
+                // Скидання форми
+                document.getElementById('itemName').value = "";
+                document.getElementById('itemPrice').value = "";
+                photoInput.value = "";
+
+                showTab('home-page', document.getElementById('btn-home'));
+                render();
             };
 
-            allProducts.unshift(newItem); // Додаємо на початок
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("Товар успішно додано!");
-            
-            // Очищуємо поля та повертаємось на головну
-            document.getElementById('itemName').value = "";
-            document.getElementById('itemPrice').value = "";
-            showTab('home-page', document.querySelector('.nav-item'));
-            render();
+            if(file) {
+                reader.readAsDataURL(file);
+            } else {
+                // Якщо фото не вибрано, ставимо пусту картинку
+                reader.onload({target: {result: 'https://via.placeholder.com/300x200?text=No+Photo'}});
+            }
         }
 
         function render() {
@@ -182,7 +205,7 @@
                     <div class="product-card">
                         <img src="${p.img}">
                         <div class="product-info">
-                            <div style="font-size:14px; font-weight:600">${p.title}</div>
+                            <div style="font-size:14px; font-weight:600; height:36px; overflow:hidden">${p.title}</div>
                             <div class="price">${p.price}</div>
                         </div>
                     </div>
@@ -198,9 +221,12 @@
         }
 
         document.getElementById('searchInput').oninput = render;
-
-        if(tg.initDataUnsafe?.user) document.getElementById('uName').innerText = tg.initDataUnsafe.user.first_name;
-        render(); // Перший запуск
+        
+        if(tg.initDataUnsafe?.user) {
+            document.getElementById('uName').innerText = "Вітаємо, " + tg.initDataUnsafe.user.first_name + "!";
+        }
+        
+        render();
     </script>
 </body>
 </html>
