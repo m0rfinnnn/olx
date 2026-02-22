@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OLX Smart Store</title>
+    <title>OLX Premium App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -14,251 +14,299 @@
             --tg-sec-bg: var(--tg-theme-secondary-bg-color, #f0f0f2);
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: #fdfdfd; color: var(--tg-text); margin: 0; padding-bottom: 110px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #fdfdfd; color: var(--tg-text); margin: 0; padding-bottom: 110px; overflow-x: hidden; }
 
+        /* Вкладки */
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Шапка та Пошук */
+        /* Пошук та Фільтри (Головна) */
         .header { background: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #eee; }
-        .header-top { display: flex; align-items: center; gap: 10px; position: relative; }
-        .search-container { flex-grow: 1; display: flex; align-items: center; background: var(--tg-sec-bg); border-radius: 10px; padding: 8px 12px; }
-        .search-container input { border: none; background: transparent; width: 100%; outline: none; font-size: 16px; margin-left: 8px; }
+        .search-container { display: flex; align-items: center; background: var(--tg-sec-bg); border-radius: 10px; padding: 10px; position: relative; }
+        .search-container input { border: none; background: transparent; width: 100%; outline: none; font-size: 16px; margin-left: 10px; }
+        
+        .search-hints { position: absolute; top: 50px; left: 0; right: 0; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 100; display: none; border: 1px solid #eee; }
+        .hint-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; }
 
-        /* Випадаючий список пошуку як в Google */
-        .search-hints { 
-            position: absolute; top: 45px; left: 0; right: 40px; background: white; 
-            border-radius: 0 0 10px 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
-            z-index: 2000; display: none; border: 1px solid #eee;
-        }
-        .hint-item { padding: 12px 15px; border-bottom: 1px solid #f9f9f9; cursor: pointer; font-size: 14px; }
-        .hint-item:last-child { border: none; }
-
-        /* Фільтри */
-        .filter-row { display: flex; gap: 10px; overflow-x: auto; padding: 12px 0 5px 0; scrollbar-width: none; }
-        .filter-chip { padding: 8px 18px; border-radius: 20px; border: 1.5px solid #ddd; font-size: 13px; white-space: nowrap; cursor: pointer; color: #666; font-weight: 600; }
+        .filter-row { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .filter-chip { padding: 8px 18px; border-radius: 20px; border: 1.5px solid #ddd; font-size: 13px; white-space: nowrap; font-weight: 600; color: #666; }
         .filter-chip.active { background: var(--olx-green); color: white; border-color: var(--olx-green); }
 
-        /* Картки товарів */
+        /* Профіль (Дизайн як на фото) */
+        .profile-header { text-align: center; padding: 25px; background: white; border-bottom: 1px solid #eee; }
+        .avatar-wrap { width: 100px; height: 100px; margin: 0 auto 15px; position: relative; }
+        #avatarPreview { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--olx-green); object-fit: cover; }
+        
+        .btn-edit-profile { background: var(--olx-green); color: white; border: none; padding: 10px 25px; border-radius: 25px; font-weight: 600; font-size: 14px; margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid #eee; border-bottom: 1px solid #eee; background: white; margin: 15px 0; }
+        .stat-box { text-align: center; padding: 15px; border-right: 1px solid #eee; }
+        .stat-box:last-child { border-right: none; }
+        .stat-val { display: block; font-weight: 800; font-size: 18px; color: var(--olx-green); }
+        .stat-label { font-size: 12px; color: #888; }
+
+        .settings-list { background: white; margin: 15px 0; border-top: 1px solid #eee; }
+        .settings-item { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .settings-item i:first-child { color: var(--olx-green); font-size: 20px; width: 35px; }
+        .settings-item span { flex-grow: 1; font-weight: 500; }
+        .settings-item i.fa-chevron-right { color: #ccc; font-size: 14px; }
+
+        /* Сітка товарів */
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
         .product-card { background: white; border-radius: 15px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .product-card img { width: 100%; height: 125px; object-fit: cover; background: #f0f0f0; }
-        .product-info { padding: 10px; }
-        .p-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: #222; }
-        .p-price { color: var(--olx-green); font-weight: 800; font-size: 16px; margin-bottom: 6px; }
-        .p-desc { font-size: 12px; color: #777; line-height: 1.3; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .product-card img { width: 100%; height: 120px; object-fit: cover; }
+        .p-info { padding: 10px; }
+        .p-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; display: block; }
+        .p-price { color: var(--olx-green); font-weight: 800; font-size: 16px; display: block; margin-bottom: 6px; }
+        .p-desc { font-size: 12px; color: #777; line-height: 1.2; height: 28px; overflow: hidden; }
 
-        /* Форма */
-        .add-form { padding: 20px; }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
-        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #ddd; box-sizing: border-box; font-family: inherit; }
-        .btn-publish { width: 100%; background: var(--olx-green); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        /* Порожній стан */
+        .empty-box { text-align: center; padding: 40px 20px; color: #bbb; }
+        .empty-box i { font-size: 50px; margin-bottom: 10px; display: block; }
 
         /* Навігація */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { text-align: center; color: var(--olx-green); font-size: 11px; font-weight: 700; flex: 1; opacity: 0.4; transition: 0.3s; }
-        .nav-item.active { opacity: 1; }
-        .nav-item i { font-size: 24px; display: block; margin-bottom: 3px; }
-        .plus-btn { width: 60px; height: 60px; background: var(--olx-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 26px; margin-top: -40px; border: 5px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-link { text-align: center; color: var(--olx-green); font-size: 12px; font-weight: 700; opacity: 0.4; flex: 1; text-decoration: none; }
+        .nav-link.active { opacity: 1; }
+        .nav-link i { font-size: 24px; display: block; margin-bottom: 4px; }
+        
+        .main-plus-btn { width: 65px; height: 65px; background: var(--olx-green); border-radius: 50%; margin-top: -45px; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; border: 5px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
-        .empty { text-align: center; padding: 60px 20px; color: #ccc; }
+        /* Форма додавання */
+        .form-page { padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #ddd; box-sizing: border-box; font-family: inherit; }
+        .btn-send { width: 100%; background: var(--olx-green); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; }
     </style>
 </head>
 <body>
 
     <div id="home-page" class="page active">
         <div class="header">
-            <div class="header-top">
-                <div class="search-container">
-                    <i class="fa fa-search" style="color: var(--olx-green)"></i>
-                    <input type="text" id="searchInput" placeholder="Пошук оголошень..." autocomplete="off">
-                </div>
-                <button class="settings-btn" style="background:none; border:none; color:var(--olx-green); font-size:20px;"><i class="fa fa-cog"></i></button>
+            <div class="search-container">
+                <i class="fa fa-search" style="color: var(--olx-green)"></i>
+                <input type="text" id="searchInput" placeholder="Пошук товарів..." autocomplete="off">
                 <div id="searchHints" class="search-hints"></div>
             </div>
             <div class="filter-row">
-                <div class="filter-chip active" onclick="filterCat('Всі', this)">Всі</div>
-                <div class="filter-chip" onclick="filterCat('Нерухомість', this)">Нерухомість</div>
-                <div class="filter-chip" onclick="filterCat('Авто', this)">Авто</div>
-                <div class="filter-chip" onclick="filterCat('Електроніка', this)">Електроніка</div>
+                <div class="filter-chip active" onclick="setFilter('Всі', this)">Всі</div>
+                <div class="filter-chip" onclick="setFilter('Електроніка', this)">Електроніка</div>
+                <div class="filter-chip" onclick="setFilter('Авто', this)">Авто</div>
+                <div class="filter-chip" onclick="setFilter('Мода', this)">Мода</div>
             </div>
         </div>
-        <div id="productGrid" class="products-grid"></div>
-        <div id="emptyState" class="empty">
-            <i class="fa-regular fa-face-frown" style="font-size: 50px;"></i>
-            <p>ТОВАРІВ ПОКИ ЩО НЕМАЄ</p>
-        </div>
-    </div>
-
-    <div id="add-page" class="page">
-        <div class="add-form">
-            <h2 style="margin-bottom:20px;">Нове оголошення</h2>
-            <div class="input-group">
-                <label>Фото</label>
-                <input type="file" id="itemPhoto" accept="image/*">
-            </div>
-            <div class="input-group">
-                <label>Назва</label>
-                <input type="text" id="itemName" placeholder="Що ви продаєте?">
-            </div>
-            <div class="input-group">
-                <label>Ціна (грн)</label>
-                <input type="number" id="itemPrice" placeholder="0">
-            </div>
-            <div class="input-group">
-                <label>Категорія</label>
-                <select id="itemCat">
-                    <option>Нерухомість</option>
-                    <option>Авто</option>
-                    <option>Електроніка</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Опис товару</label>
-                <textarea id="itemDesc" rows="3" placeholder="Опишіть ваш товар детально..."></textarea>
-            </div>
-            <button class="btn-publish" onclick="publishItem()">Опублікувати</button>
+        <div id="mainGrid" class="products-grid"></div>
+        <div id="mainEmpty" class="empty-box" style="display:none;">
+            <i class="fa-regular fa-face-frown"></i>
+            <span>ТОВАРІВ ПОКИ ЩО НЕМАЄ</span>
         </div>
     </div>
 
-    <div id="profile-page" class="page" style="text-align:center; padding: 50px 20px;">
-        <i class="fa fa-user-circle" style="font-size: 80px; color: var(--olx-green)"></i>
-        <h2 id="uName">Користувач</h2>
-        <p style="color:#888;">Ваш профіль та налаштування</p>
+    <div id="add-page" class="page form-page">
+        <h2>Виставити товар</h2>
+        <div class="form-group">
+            <label>Фото</label>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>Назва</label>
+            <input type="text" id="pName" placeholder="Що ви продаєте?">
+        </div>
+        <div class="form-group">
+            <label>Ціна (грн)</label>
+            <input type="number" id="pPrice" placeholder="0">
+        </div>
+        <div class="form-group">
+            <label>Категорія</label>
+            <select id="pCat">
+                <option>Електроніка</option>
+                <option>Авто</option>
+                <option>Мода</option>
+                <option>Інше</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Опис</label>
+            <textarea id="pDesc" rows="3" placeholder="Розкажіть про товар..."></textarea>
+        </div>
+        <button class="btn-send" onclick="addNewProduct()">Опублікувати</button>
+    </div>
+
+    <div id="profile-page" class="page">
+        <div class="profile-header">
+            <div class="avatar-wrap">
+                <img id="avatarPreview" src="https://via.placeholder.com/100" onclick="document.getElementById('avatarFile').click()">
+                <input type="file" id="avatarFile" hidden accept="image/*" onchange="updateAvatar(this)">
+            </div>
+            <h3 style="margin:0" id="uName">Roman</h3>
+            <span style="color:#888; font-size: 14px;">@landeshuu</span><br>
+            <button class="btn-edit-profile"><i class="fa fa-pencil"></i> Редагувати профіль</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box"><span class="stat-val" id="countMy">0</span><span class="stat-label">Товари</span></div>
+            <div class="stat-box"><span class="stat-val">0</span><span class="stat-label">Продано</span></div>
+            <div class="stat-box"><span class="stat-val">⭐ 5.0</span><span class="stat-label">Рейтинг</span></div>
+        </div>
+
+        <h3 style="padding-left: 20px; margin-bottom: 10px;">Мої товари</h3>
+        <div id="myGrid" class="products-grid"></div>
+        <div id="myEmpty" class="empty-box">
+            <i class="fa-regular fa-face-frown"></i>
+            <span>ТОВАРІВ ЩЕ НЕМАЄ</span>
+        </div>
+
+        <div class="settings-list">
+            <div class="settings-item"><i class="fa fa-cog"></i><span>Налаштування</span><i class="fa fa-chevron-right"></i></div>
+            <div class="settings-item"><i class="fa fa-credit-card"></i><span>Платежі</span><i class="fa fa-chevron-right"></i></div>
+            <div class="settings-item"><i class="fa fa-box"></i><span>Мої замовлення</span><i class="fa fa-chevron-right"></i></div>
+        </div>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" id="nav-h" onclick="showTab('home-page', this)"><i class="fa fa-home"></i>Головна</div>
-        <div class="plus-btn" onclick="showTab('add-page', this)"><i class="fa fa-plus"></i></div>
-        <div class="nav-item" id="nav-p" onclick="showTab('profile-page', this)"><i class="fa fa-user"></i>Профіль</div>
+        <div class="nav-link active" onclick="switchTab('home-page', this)"><i class="fa fa-home"></i>Головна</div>
+        <div class="main-plus-btn" onclick="switchTab('add-page', this)"><i class="fa fa-plus"></i></div>
+        <div class="nav-link" onclick="switchTab('profile-page', this)"><i class="fa fa-user"></i>Профіль</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-        
-        // ЗАВАНТАЖЕННЯ З ПАМ'ЯТІ (LocalStorage)
-        let allProducts = JSON.parse(localStorage.getItem('olx_products')) || [];
+
+        // ГОЛОВНЕ: ЗАВАНТАЖЕННЯ ДАНИХ
+        let products = JSON.parse(localStorage.getItem('db_olx_v2')) || [];
         let currentFilter = 'Всі';
 
-        function saveToStorage() {
-            localStorage.setItem('olx_products', JSON.stringify(allProducts));
+        function saveData() {
+            localStorage.setItem('db_olx_v2', JSON.stringify(products));
         }
 
-        function showTab(id, el) {
+        function switchTab(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(el && el.classList.contains('nav-item')) el.classList.add('active');
-            if(id !== 'home-page') tg.BackButton.show(); else tg.BackButton.hide();
+            if(el.classList.contains('nav-link')) el.classList.add('active');
+            render();
         }
 
-        tg.BackButton.onClick(() => showTab('home-page', document.getElementById('nav-h')));
+        function addNewProduct() {
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+            const desc = document.getElementById('pDesc').value;
+            const cat = document.getElementById('pCat').value;
+            const file = document.getElementById('fileInput').files[0];
 
-        function publishItem() {
-            const name = document.getElementById('itemName').value;
-            const price = document.getElementById('itemPrice').value;
-            const desc = document.getElementById('itemDesc').value;
-            const cat = document.getElementById('itemCat').value;
-            const photoInput = document.getElementById('itemPhoto');
+            if(!name || !price || !desc) { tg.showAlert("Заповніть всі поля!"); return; }
 
-            if(!name || !price || !desc) {
-                tg.showAlert("Заповніть всі поля!");
-                return;
-            }
-
-            const file = photoInput.files[0];
             const reader = new FileReader();
-
             reader.onload = function(e) {
-                const newItem = {
+                const newP = {
                     id: Date.now(),
-                    title: name,
+                    name: name,
                     price: price + " грн",
                     desc: desc,
-                    category: cat,
-                    img: e.target.result
+                    cat: cat,
+                    img: e.target.result,
+                    user: tg.initDataUnsafe?.user?.id || 'guest'
                 };
-
-                allProducts.unshift(newItem);
-                saveToStorage(); // ЗБЕРІГАЄМО У ПАМ'ЯТЬ
-                
-                tg.HapticFeedback.notificationOccurred('success');
-                
-                // Очищення
-                document.getElementById('itemName').value = "";
-                document.getElementById('itemPrice').value = "";
-                document.getElementById('itemDesc').value = "";
-                photoInput.value = "";
-
-                showTab('home-page', document.getElementById('nav-h'));
-                render();
-            };
-
-            if(file) reader.readAsDataURL(file);
-            else reader.onload({target: {result: 'https://via.placeholder.com/300x200?text=No+Photo'}});
+                products.unshift(newP);
+                saveData();
+                tg.showAlert("Опубліковано!");
+                switchTab('home-page', document.querySelectorAll('.nav-link')[0]);
+            }
+            if(file) reader.readAsDataURL(file); 
+            else reader.onload({target: {result: 'https://via.placeholder.com/300'}});
         }
 
         function render() {
-            const grid = document.getElementById('productGrid');
-            const empty = document.getElementById('emptyState');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const mainGrid = document.getElementById('mainGrid');
+            const myGrid = document.getElementById('myGrid');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const myId = tg.initDataUnsafe?.user?.id || 'guest';
 
-            let filtered = allProducts;
-            if(currentFilter !== 'Всі') filtered = filtered.filter(p => p.category === currentFilter);
-            if(searchVal) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchVal));
+            // Головна сторінка
+            let filtered = products;
+            if(currentFilter !== 'Всі') filtered = filtered.filter(p => p.cat === currentFilter);
+            if(search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
 
             if(filtered.length === 0) {
-                grid.style.display = 'none';
-                empty.style.display = 'block';
+                mainGrid.innerHTML = '';
+                document.getElementById('mainEmpty').style.display = 'block';
             } else {
-                grid.style.display = 'grid';
-                empty.style.display = 'none';
-                grid.innerHTML = filtered.map(p => `
-                    <div class="product-card">
-                        <img src="${p.img}">
-                        <div class="product-info">
-                            <div class="p-title">${p.title}</div>
-                            <div class="p-price">${p.price}</div>
-                            <div class="p-desc">${p.desc}</div>
-                        </div>
-                    </div>
-                `).join('');
+                document.getElementById('mainEmpty').style.display = 'none';
+                mainGrid.innerHTML = filtered.map(p => createCard(p)).join('');
+            }
+
+            // Сторінка профілю (Мої товари)
+            let myItems = products.filter(p => p.user === myId);
+            document.getElementById('countMy').innerText = myItems.length;
+            if(myItems.length === 0) {
+                myGrid.innerHTML = '';
+                document.getElementById('myEmpty').style.display = 'block';
+            } else {
+                document.getElementById('myEmpty').style.display = 'none';
+                myGrid.innerHTML = myItems.map(p => createCard(p)).join('');
             }
         }
 
-        // Логіка Google-підказок
-        document.getElementById('searchInput').oninput = function() {
-            const val = this.value.toLowerCase();
-            const hints = document.getElementById('searchHints');
-            
-            if(val.length > 0) {
-                const matches = allProducts.filter(p => p.title.toLowerCase().includes(val)).slice(0, 5);
-                if(matches.length > 0) {
-                    hints.innerHTML = matches.map(m => `<div class="hint-item" onclick="applyHint('${m.title}')"><i class="fa fa-search" style="margin-right:10px; color:#ccc;"></i>${m.title}</div>`).join('');
-                    hints.style.display = 'block';
-                } else { hints.style.display = 'none'; }
-            } else { hints.style.display = 'none'; }
-            render();
-        };
-
-        function applyHint(text) {
-            document.getElementById('searchInput').value = text;
-            document.getElementById('searchHints').style.display = 'none';
-            render();
+        function createCard(p) {
+            return `
+                <div class="product-card">
+                    <img src="${p.img}">
+                    <div class="p-info">
+                        <span class="p-name">${p.name}</span>
+                        <span class="p-price">${p.price}</span>
+                        <div class="p-desc">${p.desc}</div>
+                    </div>
+                </div>
+            `;
         }
 
-        function filterCat(cat, el) {
+        function setFilter(cat, el) {
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             currentFilter = cat;
             render();
         }
 
-        if(tg.initDataUnsafe?.user) document.getElementById('uName').innerText = tg.initDataUnsafe.user.first_name;
-        render();
+        document.getElementById('searchInput').oninput = function() {
+            const val = this.value.toLowerCase();
+            const hints = document.getElementById('searchHints');
+            if(val.length > 0) {
+                const matches = products.filter(p => p.name.toLowerCase().includes(val)).slice(0, 5);
+                hints.innerHTML = matches.map(m => `<div class="hint-item" onclick="applyHint('${m.name}')">${m.name}</div>`).join('');
+                hints.style.display = matches.length ? 'block' : 'none';
+            } else { hints.style.display = 'none'; }
+            render();
+        };
+
+        function applyHint(val) {
+            document.getElementById('searchInput').value = val;
+            document.getElementById('searchHints').style.display = 'none';
+            render();
+        }
+
+        function updateAvatar(input) {
+            if(input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                    localStorage.setItem('my_ava', e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        window.onload = () => {
+            const savedAva = localStorage.getItem('my_ava');
+            if(savedAva) document.getElementById('avatarPreview').src = savedAva;
+            if(tg.initDataUnsafe?.user) {
+                document.getElementById('uName').innerText = tg.initDataUnsafe.user.first_name;
+            }
+            render();
+        }
     </script>
 </body>
 </html>
