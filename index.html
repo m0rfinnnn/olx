@@ -1,341 +1,430 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NedoOLX Premium</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --green: #407c3c; --bg: #f4f5f7; --red: #e74c3c; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); padding-bottom: 90px; color: #333; overflow-x: hidden; }
-        
-        /* Header & Search */
-        .header { background: white; padding: 15px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .search { display: flex; align-items: center; background: #f0f0f2; padding: 12px; border-radius: 14px; }
-        .search input { border: none; background: transparent; outline: none; width: 100%; font-size: 16px; margin-left: 10px; }
-        
-        /* Grid & Cards */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; height: 100%; }
-        .card img { width: 100%; height: 140px; object-fit: cover; background: #eee; border-bottom: 1px solid #f0f0f0; }
-        .badge { position: absolute; top: 8px; left: 8px; background: var(--green); color: white; font-size: 10px; padding: 4px 8px; border-radius: 10px; font-weight: bold; z-index: 2; }
-        .card-body { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; }
-        .price { color: var(--green); font-weight: 800; font-size: 16px; margin-bottom: 4px; }
-        .title { font-weight: 600; font-size: 13px; margin: 4px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 32px; }
-        .user { font-size: 11px; color: #777; margin-top: auto; }
-        .delete-btn { position: absolute; top: 8px; right: 8px; background: white; color: var(--red); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; border: none; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NedoOLX Premium</title>
 
-        /* Profile Section */
-        .profile-header { position: relative; margin-bottom: 60px; }
-        .profile-cover { width: 100%; height: 120px; background: linear-gradient(45deg, #407c3c, #8eb489); border-radius: 0 0 20px 20px; }
-        .profile-card { background: white; margin: -50px 15px 0; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.07); position: relative; }
-        .profile-card img { width: 90px; height: 90px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-top: -65px; background: #eee; }
-        .stats { display: flex; justify-content: space-around; padding: 20px 15px; }
-        .stat { background: white; padding: 15px; border-radius: 15px; text-align: center; flex: 1; margin: 0 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .stat span { display: block; font-weight: 800; color: var(--green); font-size: 18px; }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-        /* Navigation */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; align-items: center; border-top: 1px solid #eee; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; font-size: 11px; color: #bbb; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: var(--green); }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
-        .plus-wrap { flex: 1; display: flex; justify-content: center; position: relative; }
-        .plus { width: 60px; height: 60px; background: var(--green); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; position: absolute; top: -45px; border: 5px solid var(--bg); box-shadow: 0 5px 15px rgba(64,124,60,0.3); }
+<style>
+:root { --green: #407c3c; --bg: #f4f5f7; --red: #e74c3c; }
 
-        /* Forms */
-        .form { padding: 20px; }
-        .form h3 { margin-bottom: 20px; }
-        .form label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
-        .form input, .form textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; font-family: inherit; box-sizing: border-box; outline: none; font-size: 16px; }
-        .form input:focus { border-color: var(--green); }
-        .btn { background: var(--green); color: white; border: none; padding: 16px; border-radius: 14px; width: 100%; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); opacity: 0.9; }
-        .btn:disabled { background: #ccc; }
-        
-        .page { display: none; animation: fadeIn 0.3s; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .empty { grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: #aaa; font-size: 14px; }
-    </style>
+body {
+margin:0;
+font-family:'Inter',sans-serif;
+background:var(--bg);
+padding-bottom:90px;
+color:#333;
+overflow-x:hidden;
+}
+
+.header {
+background:white;
+padding:15px;
+position:sticky;
+top:0;
+z-index:10;
+box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.search {
+display:flex;
+align-items:center;
+background:#f0f0f2;
+padding:12px;
+border-radius:14px;
+}
+
+.search input {
+border:none;
+background:transparent;
+outline:none;
+width:100%;
+font-size:16px;
+margin-left:10px;
+}
+
+.grid {
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+padding:15px;
+}
+
+.card {
+background:white;
+border-radius:18px;
+overflow:hidden;
+box-shadow:0 4px 12px rgba(0,0,0,0.05);
+position:relative;
+display:flex;
+flex-direction:column;
+}
+
+.card img {
+width:100%;
+height:140px;
+object-fit:cover;
+background:#eee;
+}
+
+.badge {
+position:absolute;
+top:8px;
+left:8px;
+background:var(--green);
+color:white;
+font-size:10px;
+padding:4px 8px;
+border-radius:10px;
+font-weight:bold;
+z-index:2;
+}
+
+.card-body {
+padding:10px;
+flex-grow:1;
+display:flex;
+flex-direction:column;
+}
+
+.price {
+color:var(--green);
+font-weight:800;
+font-size:16px;
+margin-bottom:4px;
+}
+
+.title {
+font-weight:600;
+font-size:13px;
+margin:4px 0;
+display:-webkit-box;
+-webkit-line-clamp:2;
+-webkit-box-orient:vertical;
+overflow:hidden;
+height:32px;
+}
+
+.user {
+font-size:11px;
+color:#777;
+margin-top:auto;
+}
+
+.delete-btn {
+position:absolute;
+top:8px;
+right:8px;
+background:white;
+color:var(--red);
+width:28px;
+height:28px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:14px;
+cursor:pointer;
+border:none;
+z-index:5;
+box-shadow:0 2px 5px rgba(0,0,0,0.2);
+}
+
+.profile-header { position:relative;margin-bottom:60px; }
+
+.profile-cover {
+width:100%;
+height:120px;
+background:linear-gradient(45deg,#407c3c,#8eb489);
+border-radius:0 0 20px 20px;
+}
+
+.profile-card {
+background:white;
+margin:-50px 15px 0;
+border-radius:20px;
+padding:20px;
+text-align:center;
+box-shadow:0 10px 25px rgba(0,0,0,0.07);
+}
+
+.profile-card img {
+width:90px;
+height:90px;
+border-radius:50%;
+border:4px solid white;
+object-fit:cover;
+margin-top:-65px;
+background:#eee;
+}
+
+.stats {
+display:flex;
+justify-content:space-around;
+padding:20px 15px;
+}
+
+.stat {
+background:white;
+padding:15px;
+border-radius:15px;
+text-align:center;
+flex:1;
+margin:0 5px;
+box-shadow:0 4px 10px rgba(0,0,0,0.03);
+}
+
+.stat span {
+display:block;
+font-weight:800;
+color:var(--green);
+font-size:18px;
+}
+
+.nav {
+position:fixed;
+bottom:0;
+width:100%;
+height:75px;
+background:white;
+display:flex;
+align-items:center;
+border-top:1px solid #eee;
+z-index:100;
+}
+
+.nav-item {
+flex:1;
+text-align:center;
+font-size:11px;
+color:#bbb;
+cursor:pointer;
+transition:0.3s;
+}
+
+.nav-item.active { color:var(--green); }
+
+.nav-item i {
+font-size:20px;
+margin-bottom:4px;
+}
+
+.plus-wrap { flex:1;display:flex;justify-content:center;position:relative; }
+
+.plus {
+width:60px;
+height:60px;
+background:var(--green);
+border-radius:50%;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+position:absolute;
+top:-45px;
+border:5px solid var(--bg);
+box-shadow:0 5px 15px rgba(64,124,60,0.3);
+cursor:pointer;
+}
+
+.form { padding:20px; }
+
+.form input,.form textarea {
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid #ddd;
+margin-bottom:15px;
+font-family:inherit;
+box-sizing:border-box;
+font-size:16px;
+}
+
+.btn {
+background:var(--green);
+color:white;
+border:none;
+padding:16px;
+border-radius:14px;
+width:100%;
+font-weight:700;
+font-size:16px;
+cursor:pointer;
+}
+
+.page { display:none; }
+.page.active { display:block; }
+
+.empty {
+grid-column:1/-1;
+text-align:center;
+padding:50px 20px;
+color:#aaa;
+font-size:14px;
+}
+</style>
 </head>
+
 <body>
 
+<!-- HOME -->
 <div id="home" class="page active">
-    <div class="header">
-        <div class="search">
-            <i class="fa fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Пошук оголошень...">
-        </div>
-    </div>
-    <div id="productGrid" class="grid"></div>
+<div class="header">
+<div class="search">
+<i class="fa fa-search"></i>
+<input type="text" id="searchInput" placeholder="Пошук оголошень...">
+</div>
+</div>
+<div id="productGrid" class="grid"></div>
 </div>
 
+<!-- PROFILE -->
 <div id="profile" class="page">
-    <div class="profile-header">
-        <div class="profile-cover"></div>
-        <div class="profile-card">
-            <img id="profileAva" src="https://www.gravatar.com/avatar/0?d=mp">
-            <h2 id="profileName">Завантаження...</h2>
-            <p id="profileBio"></p>
-            <button class="btn" onclick="switchPage('editProfile')">Редагувати профіль</button>
-        </div>
-    </div>
-    <div class="stats">
-        <div class="stat">Товари<span id="statProducts">0</span></div>
-        <div class="stat">Рейтинг<span>5.0</span></div>
-    </div>
-    <h3 style="padding-left: 15px; margin-bottom: 10px;">Мої оголошення</h3>
-    <div id="myGrid" class="grid"></div>
+<div class="profile-header">
+<div class="profile-cover"></div>
+<div class="profile-card">
+<img id="profileAva" src="https://www.gravatar.com/avatar/0?d=mp">
+<h2 id="profileName">Завантаження...</h2>
+<p id="profileBio"></p>
+<button class="btn" onclick="switchPage('editProfile')">Редагувати профіль</button>
+</div>
 </div>
 
+<div class="stats">
+<div class="stat">Товари<span id="statProducts">0</span></div>
+<div class="stat">Рейтинг<span>5.0</span></div>
+</div>
+
+<h3 style="padding-left:15px;margin-bottom:10px;">Мої оголошення</h3>
+<div id="myGrid" class="grid"></div>
+</div>
+
+<!-- EDIT PROFILE -->
 <div id="editProfile" class="page">
-    <div class="form">
-        <h3>Налаштування</h3>
-        <label>Фото профілю</label>
-        <input type="file" id="avaInput" accept="image/*">
-        <label>Ім'я</label>
-        <input type="text" id="nameInputProfile" placeholder="Ваше ім'я">
-        <label>Про себе</label>
-        <textarea id="bioInput" rows="3" placeholder="Опис профілю..."></textarea>
-        <button class="btn" id="saveProfileBtn" onclick="saveProfile()">Зберегти зміни</button>
-        <p onclick="switchPage('profile')" style="text-align:center; color:#888; margin-top:15px; cursor:pointer;">Назад</p>
-    </div>
+<div class="form">
+<h3>Налаштування</h3>
+<input type="file" id="avaInput" accept="image/*">
+<input type="text" id="nameInputProfile" placeholder="Ваше ім'я">
+<textarea id="bioInput" rows="3" placeholder="Опис профілю..."></textarea>
+<button class="btn" onclick="saveProfile()">Зберегти зміни</button>
+<p onclick="switchPage('profile')" style="text-align:center;color:#888;margin-top:15px;cursor:pointer;">Назад</p>
+</div>
 </div>
 
+<!-- ADD -->
 <div id="add" class="page">
-    <div class="form">
-        <h3>Нове оголошення</h3>
-        <label>Фото товару</label>
-        <input type="file" id="imgInput" accept="image/*">
-        <label>Назва</label>
-        <input type="text" id="nameInput" placeholder="Що ви продаєте?">
-        <label>Ціна (грн)</label>
-        <input type="number" id="priceInput" placeholder="0">
-        <label>Опис</label>
-        <textarea id="descInput" rows="4" placeholder="Деталі товару..."></textarea>
-        <button class="btn" id="publishBtn" onclick="addProduct()">Опублікувати</button>
-    </div>
+<div class="form">
+<h3>Нове оголошення</h3>
+<input type="file" id="imgInput" accept="image/*">
+<input type="text" id="nameInput" placeholder="Що ви продаєте?">
+<input type="number" id="priceInput" placeholder="0">
+<textarea id="descInput" rows="4" placeholder="Деталі товару..."></textarea>
+<button class="btn" onclick="addProduct()">Опублікувати</button>
+</div>
 </div>
 
+<!-- NAV -->
 <div class="nav">
-    <div class="nav-item active" onclick="switchPage('home', this)">
-        <i class="fa fa-th-large"></i><br>Головна
-    </div>
-    <div class="plus-wrap">
-        <div class="plus" onclick="switchPage('add')"><i class="fa fa-plus"></i></div>
-    </div>
-    <div class="nav-item" onclick="switchPage('profile', this)">
-        <i class="fa fa-user"></i><br>Профіль
-    </div>
+<div class="nav-item active" onclick="switchPage('home',this)">
+<i class="fa fa-th-large"></i><br>Головна
+</div>
+
+<div class="plus-wrap">
+<div class="plus" onclick="switchPage('add')">
+<i class="fa fa-plus"></i>
+</div>
+</div>
+
+<div class="nav-item" onclick="switchPage('profile',this)">
+<i class="fa fa-user"></i><br>Профіль
+</div>
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+document.addEventListener("DOMContentLoaded",()=>{
 
-    // !!! ВСТАВ СВІЙ URL ТУТ !!!
-    const DB_URL = "https://nedoolx-default-rtdb.europe-west1.firebasedatabase.app";
+const DB_URL="https://nedoolx-default-rtdb.europe-west1.firebasedatabase.app";
 
-    const userId = tg.initDataUnsafe?.user?.id || "debug_user";
-    const userNameDefault = tg.initDataUnsafe?.user?.first_name || "Користувач";
+const userId="debug_user";
+let userProfile={name:"Користувач",avatar:"https://www.gravatar.com/avatar/0?d=mp",bio:"Продаю цікаві речі!"};
 
-    let userProfile = {
-        name: userNameDefault,
-        avatar: "https://www.gravatar.com/avatar/0?d=mp",
-        bio: "Продаю цікаві речі!"
-    };
+function switchPage(id,el){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+if(el){
+document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+el.classList.add("active");
+}
+if(id==="home"||id==="profile")renderProducts();
+}
+window.switchPage=switchPage;
 
-    // Обробка та стиснення фото
-    function processImage(file) {
-        return new Promise((resolve) => {
-            if (!file) resolve(null);
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_SIZE = 600;
-                    let w = img.width, h = img.height;
-                    if (w > h) { if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } }
-                    else { if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7));
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-    }
+async function renderProducts(){
+const grid=document.getElementById("productGrid");
+const myGrid=document.getElementById("myGrid");
+grid.innerHTML="";
+myGrid.innerHTML="";
 
-    // Завантаження профілю
-    async function loadProfile() {
-        try {
-            const res = await fetch(`${DB_URL}/profiles/${userId}.json`);
-            const data = await res.json();
-            if (data) userProfile = data;
-            
-            document.getElementById("profileName").innerText = userProfile.name;
-            document.getElementById("profileBio").innerText = userProfile.bio;
-            document.getElementById("profileAva").src = userProfile.avatar;
-            document.getElementById("nameInputProfile").value = userProfile.name;
-            document.getElementById("bioInput").value = userProfile.bio;
-        } catch (e) { console.error(e); }
-    }
+const res=await fetch(DB_URL+"/products.json");
+const data=await res.json();
+if(!data){
+grid.innerHTML='<div class="empty">Оголошень ще немає</div>';
+return;
+}
 
-    // Збереження профілю
-    async function saveProfile() {
-        const btn = document.getElementById("saveProfileBtn");
-        btn.disabled = true;
-        const newName = document.getElementById("nameInputProfile").value;
-        const newBio = document.getElementById("bioInput").value;
-        const file = document.getElementById("avaInput").files[0];
+Object.keys(data).reverse().forEach(id=>{
+const p=data[id];
+const isMy=p.uid===userId;
 
-        const imgData = await processImage(file);
-        if (imgData) userProfile.avatar = imgData;
-        userProfile.name = newName || userProfile.name;
-        userProfile.bio = newBio;
+const html=`
+<div class="card">
+${isMy?`<button class="delete-btn" onclick="deleteProduct('${id}')"><i class="fa fa-trash"></i></button>`:""}
+<img src="${p.img}">
+<div class="card-body">
+<div class="price">${p.price} грн</div>
+<div class="title">${p.name}</div>
+<div class="user">${p.user_name}</div>
+</div>
+</div>`;
 
-        await fetch(`${DB_URL}/profiles/${userId}.json`, {
-            method: "PUT",
-            body: JSON.stringify(userProfile)
-        });
-        
-        btn.disabled = false;
-        tg.showAlert("Профіль оновлено!");
-        switchPage('profile');
-    }
+grid.insertAdjacentHTML("beforeend",html);
+if(isMy)myGrid.insertAdjacentHTML("beforeend",html);
+});
+}
+window.renderProducts=renderProducts;
 
-    // Додавання товару (КНОПКА "ОПУБЛІКУВАТИ")
-    async function addProduct() {
-        const btn = document.getElementById("publishBtn");
-        const name = document.getElementById("nameInput").value.trim();
-        const price = document.getElementById("priceInput").value;
-        const desc = document.getElementById("descInput").value.trim();
-        const file = document.getElementById("imgInput").files[0];
+async function addProduct(){
+const name=document.getElementById("nameInput").value;
+const price=document.getElementById("priceInput").value;
+if(!name||!price){alert("Заповніть поля");return;}
 
-        if (!name || !price) {
-            tg.showAlert("Вкажіть назву та ціну!");
-            return;
-        }
+await fetch(DB_URL+"/products.json",{
+method:"POST",
+body:JSON.stringify({
+name,price,
+img:"https://via.placeholder.com/300",
+uid:userId,
+user_name:userProfile.name
+})
+});
 
-        btn.disabled = true;
-        btn.innerText = "Завантаження...";
+renderProducts();
+switchPage("home");
+}
+window.addProduct=addProduct;
 
-        try {
-            const imgData = await processImage(file) || "https://via.placeholder.com/300?text=No+Photo";
-            
-            const product = {
-                name, price, desc,
-                img: imgData,
-                uid: userId,
-                user_name: userProfile.name,
-                date: Date.now()
-            };
+async function deleteProduct(id){
+await fetch(DB_URL+"/products/"+id+".json",{method:"DELETE"});
+renderProducts();
+}
+window.deleteProduct=deleteProduct;
 
-            await fetch(`${DB_URL}/products.json`, {
-                method: "POST",
-                body: JSON.stringify(product)
-            });
-
-            // Скидання форми
-            document.getElementById("nameInput").value = "";
-            document.getElementById("priceInput").value = "";
-            document.getElementById("descInput").value = "";
-            document.getElementById("imgInput").value = "";
-
-            tg.showAlert("Опубліковано!");
-            switchPage('home');
-        } catch (e) {
-            tg.showAlert("Помилка!");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Опублікувати";
-        }
-    }
-
-    // Рендер оголошень
-    async function renderProducts() {
-        const grid = document.getElementById("productGrid");
-        const myGrid = document.getElementById("myGrid");
-        
-        try {
-            const res = await fetch(`${DB_URL}/products.json`);
-            const data = await res.json();
-            
-            grid.innerHTML = "";
-            myGrid.innerHTML = "";
-
-            if (!data) {
-                grid.innerHTML = '<div class="empty">Оголошень ще немає</div>';
-                document.getElementById("statProducts").innerText = "0";
-                return;
-            }
-
-            const list = Object.keys(data).map(id => ({ id, ...data[id] })).reverse();
-            let myCount = 0;
-
-            list.forEach(p => {
-                const isMy = String(p.uid) === String(userId);
-                const html = `
-                    <div class="card">
-                        ${isMy ? `<button class="delete-btn" onclick="deleteProduct('${p.id}')"><i class="fa fa-trash"></i></button>` : ''}
-                        <img src="${p.img}" onerror="this.src='https://via.placeholder.com/300'">
-                        <div class="card-body">
-                            <div class="price">${p.price} грн</div>
-                            <div class="title">${p.name}</div>
-                            <div class="user"><i class="fa fa-user-circle"></i> ${p.user_name || 'Продавець'}</div>
-                        </div>
-                    </div>
-                `;
-                grid.insertAdjacentHTML('beforeend', html);
-                if (isMy) {
-                    myGrid.insertAdjacentHTML('beforeend', html);
-                    myCount++;
-                }
-            });
-            document.getElementById("statProducts").innerText = myCount;
-        } catch (e) { console.error(e); }
-    }
-
-    // Видалення
-    async function deleteProduct(id) {
-        if (!confirm("Видалити?")) return;
-        await fetch(`${DB_URL}/products/${id}.json`, { method: "DELETE" });
-        renderProducts();
-    }
-
-    // Перемикання сторінок
-    function switchPage(id, el) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        
-        if (el) {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-        }
-        
-        if (id === 'home' || id === 'profile') {
-            loadProfile();
-            renderProducts();
-        }
-    }
-
-    // Пошук
-    document.getElementById("searchInput").addEventListener("input", (e) => {
-        const query = e.target.value.toLowerCase();
-        document.querySelectorAll("#productGrid .card").forEach(c => {
-            const t = c.querySelector(".title").innerText.toLowerCase();
-            c.style.display = t.includes(query) ? "flex" : "none";
-        });
-    });
-
-    // Старт
-    window.onload = () => {
-        loadProfile();
-        renderProducts();
-    };
+renderProducts();
+});
 </script>
 
 </body>
