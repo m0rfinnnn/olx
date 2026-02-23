@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --green: #407c3c; --bg: #f4f5f7; --red: #e74c3c; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); padding-bottom: 90px; color: #333; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); padding-bottom: 90px; color: #333; overflow-x: hidden; }
         
         /* Header & Search */
         .header { background: white; padding: 15px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -17,14 +17,14 @@
         
         /* Grid & Cards */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
-        .card img { width: 100%; height: 140px; object-fit: cover; background: #eee; }
-        .badge { position: absolute; top: 8px; left: 8px; background: var(--green); color: white; font-size: 10px; padding: 4px 8px; border-radius: 10px; font-weight: bold; }
-        .card-body { padding: 10px; flex-grow: 1; }
-        .price { color: var(--green); font-weight: 800; font-size: 16px; }
-        .title { font-weight: 600; font-size: 13px; margin: 4px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .user { font-size: 11px; color: #777; }
-        .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: var(--red); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; border: none; }
+        .card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; height: 100%; }
+        .card img { width: 100%; height: 140px; object-fit: cover; background: #eee; border-bottom: 1px solid #f0f0f0; }
+        .badge { position: absolute; top: 8px; left: 8px; background: var(--green); color: white; font-size: 10px; padding: 4px 8px; border-radius: 10px; font-weight: bold; z-index: 2; }
+        .card-body { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; }
+        .price { color: var(--green); font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+        .title { font-weight: 600; font-size: 13px; margin: 4px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 32px; }
+        .user { font-size: 11px; color: #777; margin-top: auto; }
+        .delete-btn { position: absolute; top: 8px; right: 8px; background: white; color: var(--red); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; border: none; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         /* Profile Section */
         .profile-header { position: relative; margin-bottom: 60px; }
@@ -41,20 +41,17 @@
         .nav-item.active { color: var(--green); }
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
         .plus-wrap { flex: 1; display: flex; justify-content: center; position: relative; }
-        .plus { width: 60px; height: 60px; background: var(--green); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; position: absolute; top: -45px; border: 5px solid var(--bg); box-shadow: 0 5px 15px rgba(64,124,60,0.3); transition: transform 0.2s; }
-        .plus:active { transform: scale(0.9); }
+        .plus { width: 60px; height: 60px; background: var(--green); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; position: absolute; top: -45px; border: 5px solid var(--bg); box-shadow: 0 5px 15px rgba(64,124,60,0.3); }
 
         /* Forms */
         .form { padding: 20px; }
         .form h3 { margin-bottom: 20px; }
         .form label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
-        .form input, .form textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; font-family: inherit; box-sizing: border-box; outline: none; }
-        .form input:focus, .form textarea:focus { border-color: var(--green); }
-        
-        /* Виправлено стилі кнопки */
-        .btn { background: var(--green); color: white; border: none; padding: 16px; border-radius: 14px; width: 100%; font-weight: 700; font-size: 16px; cursor: pointer; transition: opacity 0.2s; }
-        .btn:active { opacity: 0.8; }
-        .btn:disabled { background: #999; cursor: not-allowed; }
+        .form input, .form textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; font-family: inherit; box-sizing: border-box; outline: none; font-size: 16px; }
+        .form input:focus { border-color: var(--green); }
+        .btn { background: var(--green); color: white; border: none; padding: 16px; border-radius: 14px; width: 100%; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
+        .btn:disabled { background: #ccc; }
         
         .page { display: none; animation: fadeIn 0.3s; }
         .page.active { display: block; }
@@ -81,28 +78,28 @@
             <img id="profileAva" src="https://www.gravatar.com/avatar/0?d=mp">
             <h2 id="profileName">Завантаження...</h2>
             <p id="profileBio"></p>
-            <button class="btn" onclick="switchPage('editProfile')">Редагувати</button>
+            <button class="btn" onclick="switchPage('editProfile')">Редагувати профіль</button>
         </div>
     </div>
     <div class="stats">
         <div class="stat">Товари<span id="statProducts">0</span></div>
         <div class="stat">Рейтинг<span>5.0</span></div>
     </div>
-    <h3 style="padding-left: 15px; margin-bottom: 0;">Мої оголошення</h3>
+    <h3 style="padding-left: 15px; margin-bottom: 10px;">Мої оголошення</h3>
     <div id="myGrid" class="grid"></div>
 </div>
 
 <div id="editProfile" class="page">
     <div class="form">
-        <h3>Налаштування профілю</h3>
+        <h3>Налаштування</h3>
         <label>Фото профілю</label>
         <input type="file" id="avaInput" accept="image/*">
-        <label>Ваше ім'я</label>
-        <input type="text" id="nameInputProfile" placeholder="Як вас звати?">
+        <label>Ім'я</label>
+        <input type="text" id="nameInputProfile" placeholder="Ваше ім'я">
         <label>Про себе</label>
-        <textarea id="bioInput" rows="3" placeholder="Краткий опис..."></textarea>
-        <button class="btn" id="saveProfileBtn" onclick="saveProfile()">Зберегти</button>
-        <p onclick="switchPage('profile')" style="text-align:center; color:#888; margin-top:15px; cursor:pointer;">Скасувати</p>
+        <textarea id="bioInput" rows="3" placeholder="Опис профілю..."></textarea>
+        <button class="btn" id="saveProfileBtn" onclick="saveProfile()">Зберегти зміни</button>
+        <p onclick="switchPage('profile')" style="text-align:center; color:#888; margin-top:15px; cursor:pointer;">Назад</p>
     </div>
 </div>
 
@@ -111,9 +108,12 @@
         <h3>Нове оголошення</h3>
         <label>Фото товару</label>
         <input type="file" id="imgInput" accept="image/*">
-        <input type="text" id="nameInput" placeholder="Що продаєте?">
-        <input type="number" id="priceInput" placeholder="Ціна (грн)">
-        <textarea id="descInput" rows="4" placeholder="Опишіть товар детальніше..."></textarea>
+        <label>Назва</label>
+        <input type="text" id="nameInput" placeholder="Що ви продаєте?">
+        <label>Ціна (грн)</label>
+        <input type="number" id="priceInput" placeholder="0">
+        <label>Опис</label>
+        <textarea id="descInput" rows="4" placeholder="Деталі товару..."></textarea>
         <button class="btn" id="publishBtn" onclick="addProduct()">Опублікувати</button>
     </div>
 </div>
@@ -131,61 +131,39 @@
 </div>
 
 <script>
-    // Безпечна ініціалізація Telegram (щоб не ламалося в браузері)
-    const tg = window.Telegram?.WebApp || {};
-    if (tg.expand) tg.expand();
-    if (tg.ready) tg.ready();
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-    // ТВОЯ БАЗА FIREBASE - ВСТАВ СВІЙ URL ТУТ!
+    // !!! ВСТАВ СВІЙ URL ТУТ !!!
     const DB_URL = "https://nedoolx-default-rtdb.europe-west1.firebasedatabase.app";
 
-    const userId = tg.initDataUnsafe?.user?.id || "guest_" + Math.floor(Math.random() * 10000);
-    const defaultName = tg.initDataUnsafe?.user?.first_name || "Користувач";
+    const userId = tg.initDataUnsafe?.user?.id || "debug_user";
+    const userNameDefault = tg.initDataUnsafe?.user?.first_name || "Користувач";
 
     let userProfile = {
-        name: defaultName,
+        name: userNameDefault,
         avatar: "https://www.gravatar.com/avatar/0?d=mp",
-        bio: "Вітаємо у моєму магазині!"
+        bio: "Продаю цікаві речі!"
     };
 
-    // Захист від XSS (екранування тексту)
-    const escapeHTML = (str) => {
-        if (!str) return '';
-        return str.toString().replace(/[&<>'"]/g, tag => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-        }[tag] || tag));
-    };
-
-    // Стиснення фотографій (щоб база не впала)
-    function compressImage(file, maxSize = 600) {
+    // Обробка та стиснення фото
+    function processImage(file) {
         return new Promise((resolve) => {
             if (!file) resolve(null);
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > maxSize || height > maxSize) {
-                        if (width > height) {
-                            height = Math.round((height * maxSize) / width);
-                            width = maxSize;
-                        } else {
-                            width = Math.round((width * maxSize) / height);
-                            height = maxSize;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    // Якість 0.7 - ідеальний баланс ваги і вигляду
-                    resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                    const MAX_SIZE = 600;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } }
+                    else { if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
                 };
-                img.src = event.target.result;
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         });
@@ -196,127 +174,88 @@
         try {
             const res = await fetch(`${DB_URL}/profiles/${userId}.json`);
             const data = await res.json();
-            if (data) userProfile = { ...userProfile, ...data };
-
+            if (data) userProfile = data;
+            
             document.getElementById("profileName").innerText = userProfile.name;
             document.getElementById("profileBio").innerText = userProfile.bio;
             document.getElementById("profileAva").src = userProfile.avatar;
-            
             document.getElementById("nameInputProfile").value = userProfile.name;
             document.getElementById("bioInput").value = userProfile.bio;
-        } catch (e) { console.error("Помилка завантаження профілю", e); }
+        } catch (e) { console.error(e); }
     }
 
     // Збереження профілю
     async function saveProfile() {
-        const name = document.getElementById("nameInputProfile").value;
-        const bio = document.getElementById("bioInput").value;
-        const file = document.getElementById("avaInput").files[0];
         const btn = document.getElementById("saveProfileBtn");
-
-        if (!name.trim()) return alert("Ім'я не може бути порожнім");
-
         btn.disabled = true;
-        btn.innerText = "Збереження...";
+        const newName = document.getElementById("nameInputProfile").value;
+        const newBio = document.getElementById("bioInput").value;
+        const file = document.getElementById("avaInput").files[0];
 
-        try {
-            const imgData = await compressImage(file);
-            if (imgData) userProfile.avatar = imgData;
-            userProfile.name = name;
-            userProfile.bio = bio;
+        const imgData = await processImage(file);
+        if (imgData) userProfile.avatar = imgData;
+        userProfile.name = newName || userProfile.name;
+        userProfile.bio = newBio;
 
-            await fetch(`${DB_URL}/profiles/${userId}.json`, {
-                method: "PUT",
-                body: JSON.stringify(userProfile)
-            });
-
-            if (tg.showAlert) tg.showAlert("Профіль оновлено!");
-            else alert("Профіль оновлено!");
-            
-            switchPage('profile');
-        } catch (e) {
-            alert("Помилка збереження!");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Зберегти";
-        }
+        await fetch(`${DB_URL}/profiles/${userId}.json`, {
+            method: "PUT",
+            body: JSON.stringify(userProfile)
+        });
+        
+        btn.disabled = false;
+        tg.showAlert("Профіль оновлено!");
+        switchPage('profile');
     }
 
-    // Додавання товару
+    // Додавання товару (КНОПКА "ОПУБЛІКУВАТИ")
     async function addProduct() {
-        const name = document.getElementById("nameInput").value;
-        const price = document.getElementById("priceInput").value;
-        const desc = document.getElementById("descInput").value;
-        const file = document.getElementById("imgInput").files[0];
         const btn = document.getElementById("publishBtn");
+        const name = document.getElementById("nameInput").value.trim();
+        const price = document.getElementById("priceInput").value;
+        const desc = document.getElementById("descInput").value.trim();
+        const file = document.getElementById("imgInput").files[0];
 
-        if (!name.trim() || !price) return alert("Заповніть назву та ціну!");
-
-        btn.disabled = true;
-        btn.innerText = "Публікуємо...";
-        
-        // Безпечний виклик Telegram MainButton
-        if (tg.MainButton && tg.MainButton.show) {
-            tg.MainButton.setText("Завантаження...").show();
+        if (!name || !price) {
+            tg.showAlert("Вкажіть назву та ціну!");
+            return;
         }
 
-        try {
-            const imgData = await compressImage(file) || "https://via.placeholder.com/300?text=Немає+Фото";
+        btn.disabled = true;
+        btn.innerText = "Завантаження...";
 
-            const newProduct = {
-                name: name.trim(),
-                price: parseFloat(price),
-                desc: desc.trim(),
+        try {
+            const imgData = await processImage(file) || "https://via.placeholder.com/300?text=No+Photo";
+            
+            const product = {
+                name, price, desc,
                 img: imgData,
                 uid: userId,
                 user_name: userProfile.name,
-                createdAt: Date.now()
+                date: Date.now()
             };
 
             await fetch(`${DB_URL}/products.json`, {
                 method: "POST",
-                body: JSON.stringify(newProduct)
+                body: JSON.stringify(product)
             });
 
-            if (tg.MainButton && tg.MainButton.hide) tg.MainButton.hide();
-            
-            if (tg.showAlert) tg.showAlert("Готово! Ваш товар у стрічці.");
-            else alert("Готово!");
-            
-            // Очистка форми
+            // Скидання форми
             document.getElementById("nameInput").value = "";
             document.getElementById("priceInput").value = "";
             document.getElementById("descInput").value = "";
             document.getElementById("imgInput").value = "";
 
+            tg.showAlert("Опубліковано!");
             switchPage('home');
         } catch (e) {
-            alert("Помилка при додаванні товару.");
+            tg.showAlert("Помилка!");
         } finally {
             btn.disabled = false;
             btn.innerText = "Опублікувати";
-            if (tg.MainButton && tg.MainButton.hide) tg.MainButton.hide();
         }
     }
 
-    // Видалення товару
-    async function deleteProduct(productId, btnElement) {
-        if (confirm("Видалити це оголошення?")) {
-            // Ховаємо картку одразу для красивого UI
-            const card = btnElement.closest('.card');
-            if (card) card.style.display = 'none';
-
-            try {
-                await fetch(`${DB_URL}/products/${productId}.json`, { method: "DELETE" });
-                renderProducts(); // Перемальовуємо дані з сервера
-            } catch (e) {
-                if (card) card.style.display = 'flex'; // Повертаємо, якщо помилка
-                alert("Не вдалося видалити.");
-            }
-        }
-    }
-
-    // Рендер стрічки
+    // Рендер оголошень
     async function renderProducts() {
         const grid = document.getElementById("productGrid");
         const myGrid = document.getElementById("myGrid");
@@ -329,66 +268,56 @@
             myGrid.innerHTML = "";
 
             if (!data) {
+                grid.innerHTML = '<div class="empty">Оголошень ще немає</div>';
                 document.getElementById("statProducts").innerText = "0";
-                grid.innerHTML = '<div class="empty">Наразі немає оголошень. Будьте першим!</div>';
-                myGrid.innerHTML = '<div class="empty">У вас ще немає товарів.</div>';
                 return;
             }
 
-            const products = Object.keys(data).map(id => ({ id, ...data[id] })).reverse();
-            let myItemsCount = 0;
+            const list = Object.keys(data).map(id => ({ id, ...data[id] })).reverse();
+            let myCount = 0;
 
-            products.forEach(p => {
-                const isMy = p.uid == userId;
-                
-                // Екрануємо дані для безпеки
-                const safeName = escapeHTML(p.name);
-                const safePrice = escapeHTML(p.price);
-                const safeUser = escapeHTML(p.user_name);
-                
+            list.forEach(p => {
+                const isMy = String(p.uid) === String(userId);
                 const html = `
                     <div class="card">
-                        ${isMy ? `<button class="delete-btn" onclick="deleteProduct('${p.id}', this)"><i class="fa fa-trash"></i></button>` : ''}
-                        <div class="badge">Активно</div>
-                        <img src="${p.img}" alt="Фото товару">
+                        ${isMy ? `<button class="delete-btn" onclick="deleteProduct('${p.id}')"><i class="fa fa-trash"></i></button>` : ''}
+                        <img src="${p.img}" onerror="this.src='https://via.placeholder.com/300'">
                         <div class="card-body">
-                            <div class="price">${safePrice} грн</div>
-                            <div class="title">${safeName}</div>
-                            <div class="user"><i class="fa fa-user-circle"></i> ${safeUser}</div>
+                            <div class="price">${p.price} грн</div>
+                            <div class="title">${p.name}</div>
+                            <div class="user"><i class="fa fa-user-circle"></i> ${p.user_name || 'Продавець'}</div>
                         </div>
                     </div>
                 `;
-                
                 grid.insertAdjacentHTML('beforeend', html);
                 if (isMy) {
                     myGrid.insertAdjacentHTML('beforeend', html);
-                    myItemsCount++;
+                    myCount++;
                 }
             });
+            document.getElementById("statProducts").innerText = myCount;
+        } catch (e) { console.error(e); }
+    }
 
-            document.getElementById("statProducts").innerText = myItemsCount;
-            if (myItemsCount === 0) {
-                myGrid.innerHTML = '<div class="empty">У вас ще немає товарів.</div>';
-            }
-
-        } catch (e) {
-            grid.innerHTML = '<div class="empty">Помилка завантаження бази даних</div>';
-            console.error(e);
-        }
+    // Видалення
+    async function deleteProduct(id) {
+        if (!confirm("Видалити?")) return;
+        await fetch(`${DB_URL}/products/${id}.json`, { method: "DELETE" });
+        renderProducts();
     }
 
     // Перемикання сторінок
-    function switchPage(pageId, navEl) {
+    function switchPage(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-
-        if (navEl) {
+        document.getElementById(id).classList.add('active');
+        
+        if (el) {
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            navEl.classList.add('active');
+            el.classList.add('active');
         }
-
-        // Оновлюємо стрічку при поверненні на головні екрани
-        if (pageId === 'home' || pageId === 'profile') {
+        
+        if (id === 'home' || id === 'profile') {
+            loadProfile();
             renderProducts();
         }
     }
@@ -396,24 +325,15 @@
     // Пошук
     document.getElementById("searchInput").addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase();
-        let found = false;
-        
-        document.querySelectorAll("#productGrid .card").forEach(card => {
-            const title = card.querySelector(".title").innerText.toLowerCase();
-            if (title.includes(query)) {
-                card.style.display = "flex";
-                found = true;
-            } else {
-                card.style.display = "none";
-            }
+        document.querySelectorAll("#productGrid .card").forEach(c => {
+            const t = c.querySelector(".title").innerText.toLowerCase();
+            c.style.display = t.includes(query) ? "flex" : "none";
         });
-        
-        // Можна додати логіку відображення повідомлення "Нічого не знайдено", якщо !found
     });
 
-    // Ініціалізація
-    window.onload = async () => {
-        await loadProfile();
+    // Старт
+    window.onload = () => {
+        loadProfile();
         renderProducts();
     };
 </script>
