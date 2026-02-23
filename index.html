@@ -23,6 +23,7 @@ body{margin:0;font-family:Inter, sans-serif;background:var(--bg);padding-bottom:
 .card-body{padding:12px;}
 .price{color:var(--green);font-weight:800;font-size:18px;}
 .title{font-weight:600;font-size:14px;margin-top:4px;}
+.user{font-size:12px;color:#555;margin-top:4px;}
 .delete{position:absolute;top:10px;right:10px;background:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .profile{padding:15px;}
 .profile-card{background:white;border-radius:25px;padding:20px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,0.05);}
@@ -117,131 +118,163 @@ let tg = window.Telegram.WebApp;
 tg.expand();
 let userId = tg.initDataUnsafe?.user?.id || "user1";
 
-// Зберігаємо всі дані локально
-let products = JSON.parse(localStorage.getItem("products_all")) || [];
 let profile = JSON.parse(localStorage.getItem("profile_user")) || {
-name: tg.initDataUnsafe?.user?.first_name || "Користувач",
-avatar:"https://i.pravatar.cc/100",
-cover:"https://via.placeholder.com/600x180",
-bio:"Привіт! Я продаю речі."
+    name: tg.initDataUnsafe?.user?.first_name || "Користувач",
+    avatar:"https://i.pravatar.cc/100",
+    cover:"https://via.placeholder.com/600x180",
+    bio:"Привіт! Я продаю речі."
 };
 
-function saveData(){
-localStorage.setItem("products_all",JSON.stringify(products));
-localStorage.setItem("profile_user",JSON.stringify(profile));
+function saveProfileData(){
+    localStorage.setItem("profile_user", JSON.stringify(profile));
 }
 
 // --- PROFILE ---
 function loadProfile(){
-document.getElementById("profileName").innerText = profile.name;
-document.getElementById("profileBio").innerText = profile.bio;
-document.getElementById("profileAva").src = profile.avatar;
-document.getElementById("profileCover").style.backgroundImage = `url(${profile.cover})`;
-document.getElementById("nameInputProfile").value = profile.name;
-document.getElementById("bioInput").value = profile.bio;
+    document.getElementById("profileName").innerText = profile.name;
+    document.getElementById("profileBio").innerText = profile.bio;
+    document.getElementById("profileAva").src = profile.avatar;
+    document.getElementById("profileCover").style.backgroundImage = `url(${profile.cover})`;
+    document.getElementById("nameInputProfile").value = profile.name;
+    document.getElementById("bioInput").value = profile.bio;
 }
 
 // --- SAVE PROFILE ---
 function saveProfile(){
-let name=document.getElementById("nameInputProfile").value;
-let bio=document.getElementById("bioInput").value;
-let avaFile=document.getElementById("avaInput").files[0];
-let coverFile=document.getElementById("coverInput").files[0];
+    let name = document.getElementById("nameInputProfile").value;
+    let bio = document.getElementById("bioInput").value;
+    let avaFile = document.getElementById("avaInput").files[0];
+    let coverFile = document.getElementById("coverInput").files[0];
 
-if(avaFile){
-let reader=new FileReader();
-reader.onload=e=>{ profile.avatar=e.target.result; afterSave(); };
-reader.readAsDataURL(avaFile);
-}else{ profile.avatar=profile.avatar; }
+    if(avaFile){
+        let reader=new FileReader();
+        reader.onload=e=>{ profile.avatar=e.target.result; afterSave(); };
+        reader.readAsDataURL(avaFile);
+    }
 
-if(coverFile){
-let reader=new FileReader();
-reader.onload=e=>{ profile.cover=e.target.result; afterSave(); };
-reader.readAsDataURL(coverFile);
-}else{ profile.cover=profile.cover; }
+    if(coverFile){
+        let reader=new FileReader();
+        reader.onload=e=>{ profile.cover=e.target.result; afterSave(); };
+        reader.readAsDataURL(coverFile);
+    }
 
-profile.name=name;
-profile.bio=bio;
+    profile.name = name;
+    profile.bio = bio;
 
-function afterSave(){
-saveData();
-switchPage('profile');
-loadProfile();
-}
-saveData();
-switchPage('profile');
-loadProfile();
+    function afterSave(){
+        saveProfileData();
+        switchPage('profile');
+        loadProfile();
+    }
+    saveProfileData();
+    switchPage('profile');
+    loadProfile();
 }
 
 // --- ADD PRODUCT ---
-function addProduct(){
-let name=document.getElementById("nameInput").value;
-let price=document.getElementById("priceInput").value;
-if(!name||!price){tg.showAlert("Заповніть поля!");return;}
-let file=document.getElementById("imgInput").files[0];
-let reader=new FileReader();
-reader.onload=e=>{
-products.unshift({
-id:Date.now(),
-name:name,
-price:price,
-img:e.target.result,
-uid:userId
-});
-saveData();
-document.getElementById("nameInput").value="";
-document.getElementById("priceInput").value="";
-document.getElementById("descInput").value="";
-document.getElementById("imgInput").value="";
-switchPage('home',document.querySelectorAll('.nav-item')[0]);
-renderProducts();
-};
-if(file){ reader.readAsDataURL(file); } else { reader.onload({target:{result:"https://via.placeholder.com/300"}}); }
+async function addProduct(){
+    let name=document.getElementById("nameInput").value;
+    let price=document.getElementById("priceInput").value;
+    if(!name||!price){tg.showAlert("Заповніть поля!"); return;}
+
+    let file=document.getElementById("imgInput").files[0];
+    let reader=new FileReader();
+    reader.onload=async e=>{
+        // Відправка нового товару на сервер
+        let imgData = e.target.result || "https://via.placeholder.com/300";
+        await fetch("http://localhost:8000/products", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({
+                action:"add_product",
+                name:name,
+                price:price,
+                img:imgData
+            })
+        });
+        document.getElementById("nameInput").value="";
+        document.getElementById("priceInput").value="";
+        document.getElementById("descInput").value="";
+        document.getElementById("imgInput").value="";
+        switchPage('home',document.querySelectorAll('.nav-item')[0]);
+        renderProducts();
+    };
+    if(file){ reader.readAsDataURL(file); } else { reader.onload({target:{result:"https://via.placeholder.com/300"}}); }
 }
 
 // --- RENDER ---
-function renderProducts(){
-let grid=document.getElementById("productGrid");
-if(products.length===0){ grid.innerHTML='<div class="empty">Немає товарів</div>'; } 
-else { grid.innerHTML = products.map(p=>`<div class="card"><div class="badge">Активний</div><img src="${p.img}"><div class="card-body"><div class="price">${p.price} грн</div><div class="title">${p.name}</div></div></div>`).join(''); }
+async function renderProducts(){
+    let grid=document.getElementById("productGrid");
+    try{
+        let response = await fetch("http://localhost:8000/products");
+        let products = await response.json();
+        if(products.length===0){ grid.innerHTML='<div class="empty">Немає товарів</div>'; }
+        else {
+            grid.innerHTML = products.map(p=>`
+                <div class="card">
+                    <div class="badge">Активний</div>
+                    <img src="${p.img}">
+                    <div class="card-body">
+                        <div class="price">${p.price} грн</div>
+                        <div class="title">${p.name}</div>
+                        <div class="user">Від: ${p.user_name}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-let my=products.filter(p=>p.uid===userId);
-document.getElementById("statProducts").innerText=my.length;
-document.getElementById("statSold").innerText=Math.floor(my.length/3);
-let myGrid=document.getElementById("myGrid");
-if(my.length===0){ myGrid.innerHTML='<div class="empty">Товарів поки що немає</div>'; }
-else{ myGrid.innerHTML = my.map(p=>`<div class="card"><div class="delete" onclick="deleteProduct(${p.id})"><i class="fa fa-trash"></i></div><img src="${p.img}"><div class="card-body"><div class="price">${p.price} грн</div><div class="title">${p.name}</div></div></div>`).join(''); }
+        // Мої товари
+        let my = products.filter(p=>p.uid==userId);
+        document.getElementById("statProducts").innerText=my.length;
+        document.getElementById("statSold").innerText=Math.floor(my.length/3);
+        let myGrid=document.getElementById("myGrid");
+        if(my.length===0){ myGrid.innerHTML='<div class="empty">Товарів поки що немає</div>'; }
+        else{
+            myGrid.innerHTML = my.map(p=>`
+                <div class="card">
+                    <div class="delete" onclick="deleteProduct(${p.id})"><i class="fa fa-trash"></i></div>
+                    <img src="${p.img}">
+                    <div class="card-body">
+                        <div class="price">${p.price} грн</div>
+                        <div class="title">${p.name}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch(err){
+        grid.innerHTML='<div class="empty">Не вдалося завантажити товари з сервера</div>';
+        console.error(err);
+    }
 }
 
-// --- DELETE ---
+// --- DELETE (локально, поки сервер не обробляє) ---
 function deleteProduct(id){
-products=products.filter(p=>p.id!==id);
-saveData();
-renderProducts();
+    // Для реального видалення треба реалізувати POST / DELETE на сервері
+    renderProducts();
 }
 
 // --- NAV ---
 function switchPage(id,el){
-document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-if(el){ document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active")); el.classList.add("active"); }
-loadProfile();
-renderProducts();
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    if(el){ document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active")); el.classList.add("active"); }
+    loadProfile();
+    renderProducts();
 }
 
 // --- SEARCH ---
 document.getElementById("searchInput").addEventListener("input",e=>{
-let val=e.target.value.toLowerCase();
-document.querySelectorAll("#productGrid .card").forEach(c=>{
-let t=c.querySelector(".title").innerText.toLowerCase();
-c.style.display=t.includes(val)?"block":"none";
-});
+    let val=e.target.value.toLowerCase();
+    document.querySelectorAll("#productGrid .card").forEach(c=>{
+        let t=c.querySelector(".title").innerText.toLowerCase();
+        c.style.display=t.includes(val)?"block":"none";
+    });
 });
 
 // --- START ---
 window.onload=()=>{
-loadProfile();
-renderProducts();
+    loadProfile();
+    renderProducts();
 };
 </script>
 </body>
