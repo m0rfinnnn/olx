@@ -189,7 +189,9 @@ async function addProduct(){
                 action:"add_product",
                 name:name,
                 price:price,
-                img:imgData
+                img:imgData,
+                uid:userId,
+                user_name:profile.name
             })
         });
         document.getElementById("nameInput").value="";
@@ -222,35 +224,10 @@ async function renderProducts(){
                 </div>
             `).join('');
         }
-
-        // Мої товари
-        let my = products.filter(p=>p.uid==userId);
-        document.getElementById("statProducts").innerText=my.length;
-        document.getElementById("statSold").innerText=Math.floor(my.length/3);
-        let myGrid=document.getElementById("myGrid");
-        if(my.length===0){ myGrid.innerHTML='<div class="empty">Товарів поки що немає</div>'; }
-        else{
-            myGrid.innerHTML = my.map(p=>`
-                <div class="card">
-                    <div class="delete" onclick="deleteProduct(${p.id})"><i class="fa fa-trash"></i></div>
-                    <img src="${p.img}">
-                    <div class="card-body">
-                        <div class="price">${p.price} грн</div>
-                        <div class="title">${p.name}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
     } catch(err){
         grid.innerHTML='<div class="empty">Не вдалося завантажити товари з сервера</div>';
         console.error(err);
     }
-}
-
-// --- DELETE (локально, поки сервер не обробляє) ---
-function deleteProduct(id){
-    // Для реального видалення треба реалізувати POST / DELETE на сервері
-    renderProducts();
 }
 
 // --- NAV ---
@@ -272,10 +249,7 @@ document.getElementById("searchInput").addEventListener("input",e=>{
 });
 
 // --- START ---
-window.onload=()=>{
-    loadProfile();
-    renderProducts();
-};
+window.onload=()=>{ loadProfile(); renderProducts(); };
 </script>
 </body>
 </html>
