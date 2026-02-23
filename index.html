@@ -6,218 +6,40 @@
 <title>OLX Community Premium</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
 <style>
 :root{
 --green:#407c3c;
 --light:#eef5ee;
 --bg:#f4f5f7;
 }
-
-body{
-margin:0;
-font-family:Inter, sans-serif;
-background:var(--bg);
-padding-bottom:90px;
-}
-
-/* HEADER */
-.header{
-background:white;
-padding:15px;
-position:sticky;
-top:0;
-z-index:10;
-}
-
-.search{
-display:flex;
-align-items:center;
-background:#f0f0f2;
-padding:12px;
-border-radius:14px;
-}
-
-.search input{
-border:none;
-background:transparent;
-outline:none;
-width:100%;
-font-size:16px;
-margin-left:10px;
-}
-
-/* GRID */
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
-padding:15px;
-}
-
-.card{
-background:white;
-border-radius:20px;
-overflow:hidden;
-box-shadow:0 5px 15px rgba(0,0,0,0.05);
-position:relative;
-}
-
-.card img{
-width:100%;
-height:150px;
-object-fit:cover;
-}
-
-.badge{
-position:absolute;
-top:10px;
-left:10px;
-background:var(--green);
-color:white;
-font-size:12px;
-padding:5px 10px;
-border-radius:20px;
-}
-
-.card-body{
-padding:12px;
-}
-
-.price{
-color:var(--green);
-font-weight:800;
-font-size:18px;
-}
-
-.title{
-font-weight:600;
-font-size:14px;
-margin-top:4px;
-}
-
-.delete{
-position:absolute;
-top:10px;
-right:10px;
-background:white;
-border-radius:50%;
-width:28px;
-height:28px;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-}
-
-/* PROFILE */
-.profile{
-padding:15px;
-}
-
-.profile-card{
-background:white;
-border-radius:25px;
-padding:20px;
-text-align:center;
-box-shadow:0 8px 20px rgba(0,0,0,0.05);
-}
-
-.profile img{
-width:100px;
-height:100px;
-border-radius:50%;
-object-fit:cover;
-margin-top:-60px;
-border:5px solid white;
-}
-
-.stats{
-display:flex;
-justify-content:space-around;
-background:white;
-margin-top:15px;
-padding:15px;
-border-radius:18px;
-}
-
-.stat span{
-display:block;
-font-weight:800;
-color:var(--green);
-font-size:18px;
-}
-
-/* BUTTONS */
-.btn{
-background:var(--green);
-color:white;
-border:none;
-padding:14px;
-border-radius:16px;
-width:100%;
-font-weight:700;
-cursor:pointer;
-}
-
+body{margin:0;font-family:Inter, sans-serif;background:var(--bg);padding-bottom:90px;}
+.header{background:white;padding:15px;position:sticky;top:0;z-index:10;}
+.search{display:flex;align-items:center;background:#f0f0f2;padding:12px;border-radius:14px;}
+.search input{border:none;background:transparent;outline:none;width:100%;font-size:16px;margin-left:10px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:15px;}
+.card{background:white;border-radius:20px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.05);position:relative;}
+.card img{width:100%;height:150px;object-fit:cover;}
+.badge{position:absolute;top:10px;left:10px;background:var(--green);color:white;font-size:12px;padding:5px 10px;border-radius:20px;}
+.card-body{padding:12px;}
+.price{color:var(--green);font-weight:800;font-size:18px;}
+.title{font-weight:600;font-size:14px;margin-top:4px;}
+.delete{position:absolute;top:10px;right:10px;background:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.profile{padding:15px;}
+.profile-card{background:white;border-radius:25px;padding:20px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,0.05);}
+.profile img{width:100px;height:100px;border-radius:50%;object-fit:cover;margin-top:-60px;border:5px solid white;}
+.stats{display:flex;justify-content:space-around;background:white;margin-top:15px;padding:15px;border-radius:18px;}
+.stat span{display:block;font-weight:800;color:var(--green);font-size:18px;}
+.btn{background:var(--green);color:white;border:none;padding:14px;border-radius:16px;width:100%;font-weight:700;cursor:pointer;}
 .page{display:none;}
 .page.active{display:block;}
-
-/* NAV */
-.nav{
-position:fixed;
-bottom:0;
-width:100%;
-height:80px;
-background:white;
-display:flex;
-align-items:center;
-border-top:1px solid #eee;
-}
-
-.nav-item{
-flex:1;
-text-align:center;
-font-size:12px;
-color:#999;
-cursor:pointer;
-}
-
+.nav{position:fixed;bottom:0;width:100%;height:80px;background:white;display:flex;align-items:center;border-top:1px solid #eee;}
+.nav-item{flex:1;text-align:center;font-size:12px;color:#999;cursor:pointer;}
 .nav-item.active{color:var(--green);}
-
-.plus{
-width:65px;
-height:65px;
-background:var(--green);
-border-radius:50%;
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:28px;
-margin-top:-40px;
-border:6px solid var(--bg);
-}
-
-/* FORM */
-.form{
-padding:15px;
-}
-
-.form input, .form textarea{
-width:100%;
-padding:12px;
-border-radius:12px;
-border:1px solid #eee;
-margin-bottom:15px;
-font-size:14px;
-}
-
-.empty{
-text-align:center;
-padding:40px;
-color:#aaa;
-}
+.plus{width:65px;height:65px;background:var(--green);border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-size:28px;margin-top:-40px;border:6px solid var(--bg);}
+.form{padding:15px;}
+.form input,.form textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #eee;margin-bottom:15px;font-size:14px;}
+.empty{text-align:center;padding:40px;color:#aaa;}
+.profile-cover{width:100%;height:180px;background:#ccc center/cover;position:relative;border-radius:15px;}
 </style>
 </head>
 <body>
@@ -236,24 +58,37 @@ color:#aaa;
 <!-- PROFILE -->
 <div id="profile" class="page">
 <div class="profile">
+<div id="profileCover" class="profile-cover"></div>
 <div class="profile-card">
 <img id="profileAva">
 <h2 id="profileName"></h2>
-<button class="btn" onclick="switchPage('add')">Виставити товар</button>
+<p id="profileBio"></p>
+<button class="btn" onclick="switchPage('editProfile')">Редагувати профіль</button>
 </div>
-
 <div class="stats">
 <div class="stat">Товари<span id="statProducts">0</span></div>
 <div class="stat">Продано<span id="statSold">0</span></div>
 <div class="stat">⭐<span id="statRating">4.8</span></div>
 </div>
-
 <h3>Мої товари</h3>
 <div id="myGrid" class="grid"></div>
 </div>
 </div>
 
-<!-- ADD -->
+<!-- EDIT PROFILE -->
+<div id="editProfile" class="page">
+<div class="form">
+<label>Шапка профілю</label>
+<input type="file" id="coverInput">
+<label>Аватар</label>
+<input type="file" id="avaInput">
+<input type="text" id="nameInputProfile" placeholder="Ім’я">
+<textarea id="bioInput" placeholder="Опис профілю"></textarea>
+<button class="btn" onclick="saveProfile()">Зберегти зміни</button>
+</div>
+</div>
+
+<!-- ADD PRODUCT -->
 <div id="add" class="page">
 <div class="form">
 <input type="file" id="imgInput">
@@ -280,142 +115,134 @@ color:#aaa;
 <script>
 let tg = window.Telegram.WebApp;
 tg.expand();
+let userId = tg.initDataUnsafe?.user?.id || "user1";
 
-let userId = tg.initDataUnsafe?.user?.id || 1;
-
-let products = JSON.parse(localStorage.getItem("db_v2")) || [];
-let profile = JSON.parse(localStorage.getItem("profile_v2")) || {
-name: tg.initDataUnsafe?.user?.first_name || "Roman",
-ava:"https://i.pravatar.cc/300"
+// Зберігаємо всі дані локально
+let products = JSON.parse(localStorage.getItem("products_all")) || [];
+let profile = JSON.parse(localStorage.getItem("profile_user")) || {
+name: tg.initDataUnsafe?.user?.first_name || "Користувач",
+avatar:"https://i.pravatar.cc/100",
+cover:"https://via.placeholder.com/600x180",
+bio:"Привіт! Я продаю речі."
 };
 
-function saveDB(){
-localStorage.setItem("db_v2",JSON.stringify(products));
+function saveData(){
+localStorage.setItem("products_all",JSON.stringify(products));
+localStorage.setItem("profile_user",JSON.stringify(profile));
 }
 
-function render(){
+// --- PROFILE ---
+function loadProfile(){
+document.getElementById("profileName").innerText = profile.name;
+document.getElementById("profileBio").innerText = profile.bio;
+document.getElementById("profileAva").src = profile.avatar;
+document.getElementById("profileCover").style.backgroundImage = `url(${profile.cover})`;
+document.getElementById("nameInputProfile").value = profile.name;
+document.getElementById("bioInput").value = profile.bio;
+}
+
+// --- SAVE PROFILE ---
+function saveProfile(){
+let name=document.getElementById("nameInputProfile").value;
+let bio=document.getElementById("bioInput").value;
+let avaFile=document.getElementById("avaInput").files[0];
+let coverFile=document.getElementById("coverInput").files[0];
+
+if(avaFile){
+let reader=new FileReader();
+reader.onload=e=>{ profile.avatar=e.target.result; afterSave(); };
+reader.readAsDataURL(avaFile);
+}else{ profile.avatar=profile.avatar; }
+
+if(coverFile){
+let reader=new FileReader();
+reader.onload=e=>{ profile.cover=e.target.result; afterSave(); };
+reader.readAsDataURL(coverFile);
+}else{ profile.cover=profile.cover; }
+
+profile.name=name;
+profile.bio=bio;
+
+function afterSave(){
+saveData();
+switchPage('profile');
+loadProfile();
+}
+saveData();
+switchPage('profile');
+loadProfile();
+}
+
+// --- ADD PRODUCT ---
+function addProduct(){
+let name=document.getElementById("nameInput").value;
+let price=document.getElementById("priceInput").value;
+if(!name||!price){tg.showAlert("Заповніть поля!");return;}
+let file=document.getElementById("imgInput").files[0];
+let reader=new FileReader();
+reader.onload=e=>{
+products.unshift({
+id:Date.now(),
+name:name,
+price:price,
+img:e.target.result,
+uid:userId
+});
+saveData();
+document.getElementById("nameInput").value="";
+document.getElementById("priceInput").value="";
+document.getElementById("descInput").value="";
+document.getElementById("imgInput").value="";
+switchPage('home',document.querySelectorAll('.nav-item')[0]);
+renderProducts();
+};
+if(file){ reader.readAsDataURL(file); } else { reader.onload({target:{result:"https://via.placeholder.com/300"}}); }
+}
+
+// --- RENDER ---
+function renderProducts(){
 let grid=document.getElementById("productGrid");
-if(products.length===0){
-grid.innerHTML='<div class="empty">Немає товарів</div>';
-return;
-}
-grid.innerHTML=products.map(p=>`
-<div class="card">
-<div class="badge">Активний</div>
-<img src="${p.img}">
-<div class="card-body">
-<div class="price">${p.price} грн</div>
-<div class="title">${escapeHTML(p.name)}</div>
-</div>
-</div>
-`).join("");
-}
-
-function renderProfile(){
-document.getElementById("profileName").innerText=profile.name;
-document.getElementById("profileAva").src=profile.ava;
+if(products.length===0){ grid.innerHTML='<div class="empty">Немає товарів</div>'; } 
+else { grid.innerHTML = products.map(p=>`<div class="card"><div class="badge">Активний</div><img src="${p.img}"><div class="card-body"><div class="price">${p.price} грн</div><div class="title">${p.name}</div></div></div>`).join(''); }
 
 let my=products.filter(p=>p.uid===userId);
 document.getElementById("statProducts").innerText=my.length;
 document.getElementById("statSold").innerText=Math.floor(my.length/3);
-
-let grid=document.getElementById("myGrid");
-if(my.length===0){
-grid.innerHTML='<div class="empty">Товарів поки що немає</div>';
-return;
-}
-grid.innerHTML=my.map(p=>`
-<div class="card">
-<div class="delete" onclick="deleteProduct(${p.id})">
-<i class="fa fa-trash"></i>
-</div>
-<img src="${p.img}">
-<div class="card-body">
-<div class="price">${p.price} грн</div>
-<div class="title">${escapeHTML(p.name)}</div>
-</div>
-</div>
-`).join("");
+let myGrid=document.getElementById("myGrid");
+if(my.length===0){ myGrid.innerHTML='<div class="empty">Товарів поки що немає</div>'; }
+else{ myGrid.innerHTML = my.map(p=>`<div class="card"><div class="delete" onclick="deleteProduct(${p.id})"><i class="fa fa-trash"></i></div><img src="${p.img}"><div class="card-body"><div class="price">${p.price} грн</div><div class="title">${p.name}</div></div></div>`).join(''); }
 }
 
-function addProduct(){
-let name=nameInput.value;
-let price=priceInput.value;
-if(!name||!price){tg.showAlert("Заповніть поля");return;}
-
-let reader=new FileReader();
-let file=imgInput.files[0];
-
-if(file){
-reader.onload=e=>{
-saveProduct(e.target.result);
-};
-reader.readAsDataURL(file);
-}else{
-saveProduct("https://via.placeholder.com/300");
-}
-}
-
-function saveProduct(img){
-products.unshift({
-id:Date.now(),
-name:nameInput.value,
-price:priceInput.value,
-img:img,
-uid:userId
-});
-saveDB();
-nameInput.value="";
-priceInput.value="";
-descInput.value="";
-imgInput.value="";
-switchPage("home",document.querySelectorAll(".nav-item")[0]);
-render();
-renderProfile();
-}
-
+// --- DELETE ---
 function deleteProduct(id){
 products=products.filter(p=>p.id!==id);
-saveDB();
-render();
-renderProfile();
+saveData();
+renderProducts();
 }
 
+// --- NAV ---
 function switchPage(id,el){
 document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
 document.getElementById(id).classList.add("active");
-if(el){
-document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
-el.classList.add("active");
-}
-render();
-renderProfile();
+if(el){ document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active")); el.classList.add("active"); }
+loadProfile();
+renderProducts();
 }
 
-function escapeHTML(text){
-let div=document.createElement("div");
-div.innerText=text;
-return div.innerHTML;
-}
-
+// --- SEARCH ---
 document.getElementById("searchInput").addEventListener("input",e=>{
 let val=e.target.value.toLowerCase();
-let filtered=products.filter(p=>p.name.toLowerCase().includes(val));
-document.getElementById("productGrid").innerHTML=filtered.map(p=>`
-<div class="card">
-<div class="badge">Активний</div>
-<img src="${p.img}">
-<div class="card-body">
-<div class="price">${p.price} грн</div>
-<div class="title">${escapeHTML(p.name)}</div>
-</div>
-</div>
-`).join("");
+document.querySelectorAll("#productGrid .card").forEach(c=>{
+let t=c.querySelector(".title").innerText.toLowerCase();
+c.style.display=t.includes(val)?"block":"none";
+});
 });
 
-render();
-renderProfile();
+// --- START ---
+window.onload=()=>{
+loadProfile();
+renderProducts();
+};
 </script>
-
 </body>
 </html>
