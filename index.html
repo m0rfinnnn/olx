@@ -1,69 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { margin: 0; overflow: hidden; touch-action: none; background: #f0f0f0; font-family: sans-serif; }
-        canvas { display: block; background: #ffffff; }
-        #status { position: absolute; top: 10px; left: 10px; pointer-events: none; color: #888; font-size: 12px; }
+        :root {
+            --main-green: #388e3c;
+            --bg-gray: #f4f4f4;
+            --text-dark: #333;
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg-gray); color: var(--text-dark); padding-bottom: 70px; }
+        
+        /* Header */
+        .header { background: white; padding: 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .search-container { display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 8px 12px; gap: 10px; }
+        .search-container input { border: none; outline: none; flex: 1; font-size: 16px; }
+        .settings-btn { color: var(--main-green); font-size: 20px; cursor: pointer; }
+
+        .filters-btn { display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ddd; border-radius: 8px; margin: 10px 15px; padding: 8px; font-weight: bold; color: var(--main-green); gap: 8px; }
+
+        /* Grid */
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px; }
+        .product-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .product-img { width: 100%; height: 140px; background: #eee; object-fit: cover; }
+        .product-info { padding: 10px; }
+        .product-title { font-size: 14px; margin: 0; height: 36px; overflow: hidden; }
+        .product-price { font-weight: bold; font-size: 16px; color: var(--main-green); margin: 5px 0; }
+
+        /* Bottom Menu */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; align-items: center; padding: 10px 0; border-top: 1px solid #ddd; }
+        .nav-item { display: flex; flexDirection: column; align-items: center; font-size: 12px; color: #777; text-decoration: none; }
+        .nav-item.active { color: var(--main-green); }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+
+        .add-btn { background: var(--main-green); color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 8px; position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: none; }
+        
+        #empty-state { text-align: center; padding: 50px 20px; color: #999; }
     </style>
 </head>
 <body>
-    <div id="status">Підключення...</div>
-    <canvas id="c"></canvas>
+
+    <div class="header">
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <div class="search-container" style="flex: 1;">
+                <i class="fa fa-search" style="color: var(--main-green)"></i>
+                <input type="text" placeholder="Пошук товарів...">
+                <i class="fa fa-microphone" style="color: var(--main-green)"></i>
+            </div>
+            <i class="fa fa-cog settings-btn" onclick="openSettings()"></i>
+        </div>
+    </div>
+
+    <button class="filters-btn"><i class="fa fa-filter"></i> Фільтри</button>
+
+    <div id="product-list" class="product-grid">
+        </div>
+
+    <div id="empty-state">
+        <i class="fa fa-shopping-basket" style="font-size: 50px; margin-bottom: 10px;"></i>
+        <p>Товарів поки немає. Будьте першим!</p>
+    </div>
+
+    <button class="add-btn" onclick="addItem()">
+        <i class="fa fa-plus"></i> Виставити товар
+    </button>
+
+    <div class="nav-bar">
+        <div class="nav-item active"><i class="fa fa-home"></i>Головна</div>
+        <div class="nav-item" onclick="openProfile()"><i class="fa fa-plus-circle" style="font-size: 40px;"></i></div>
+        <div class="nav-item"><i class="fa fa-user"></i>Профіль</div>
+    </div>
+
     <script>
-        const canvas = document.getElementById('c');
-        const ctx = canvas.getContext('2d');
-        const status = document.getElementById('status');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        let tg = window.Telegram.WebApp;
+        tg.expand();
 
-        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        const ws = new WebSocket(`${protocol}://${window.location.host}/ws`);
-
-        let drawing = false;
-        let last = {x: 0, y: 0};
-
-        ws.onopen = () => status.innerText = "Онлайн (спільна дошка)";
-        ws.onclose = () => status.innerText = "Офлайн (перезавантажте)";
-
-        function draw(x0, y0, x1, y1, color, emit) {
-            ctx.beginPath();
-            ctx.moveTo(x0, y0);
-            ctx.lineTo(x1, y1);
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 4;
-            ctx.lineCap = 'round';
-            ctx.stroke();
-            if(emit && ws.readyState === 1) {
-                ws.send(JSON.stringify({x0, y0, x1, y1}));
+        function addItem() {
+            // В реальному додатку тут відкривається форма
+            const title = prompt("Назва товару:");
+            const price = prompt("Ціна (грн):");
+            if(title && price) {
+                document.getElementById('empty-state').style.display = 'none';
+                const grid = document.getElementById('product-list');
+                const card = `
+                    <div class="product-card">
+                        <div class="product-img"></div>
+                        <div class="product-info">
+                            <p class="product-title">${title}</p>
+                            <p class="product-price">${price} грн</p>
+                        </div>
+                    </div>`;
+                grid.innerHTML += card;
+                
+                // Надсилаємо боту інфу про новий товар
+                tg.sendData(JSON.stringify({action: "new_item", title, price}));
             }
         }
 
-        const getPos = (e) => {
-            const t = e.touches ? e.touches[0] : e;
-            return {x: t.clientX, y: t.clientY};
-        };
-
-        canvas.onmousedown = canvas.ontouchstart = (e) => {
-            drawing = true;
-            last = getPos(e);
-        };
-
-        window.onmouseup = window.ontouchend = () => drawing = false;
-
-        canvas.onmousemove = canvas.ontouchmove = (e) => {
-            if(!drawing) return;
-            const curr = getPos(e);
-            draw(last.x, last.y, curr.x, curr.y, '#000000', true);
-            last = curr;
-        };
-
-        ws.onmessage = (e) => {
-            const d = JSON.parse(e.data);
-            draw(d.x0, d.y0, d.x1, d.y1, '#ff4444', false); // Чужі лінії - червоні
-        };
+        function openSettings() { tg.showAlert("Налаштування профілю"); }
+        function openProfile() { tg.showAlert("Редагування профілю та аватарки"); }
     </script>
 </body>
 </html>
