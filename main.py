@@ -10,8 +10,8 @@ from aiogram.types import WebAppInfo, InlineKeyboardMarkup, InlineKeyboardButton
 import uvicorn
 
 # --- НАЛАШТУВАННЯ ---
-BOT_TOKEN = "ТВІЙ_ТОКЕН"
-WEB_APP_URL = "https://твій-проект.onrender.com" 
+BOT_TOKEN = "8483109575:AAHN0-ZVB37URDe4IXCNaRuKfFLBnUlSq-4"
+WEB_APP_URL = "https://olx-2-vtdi.onrender.com" 
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
