@@ -1,88 +1,69 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html>
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Спільна Малювалка</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #ffffff; }
-        canvas { display: block; touch-action: none; }
+        body { margin: 0; overflow: hidden; touch-action: none; background: #f0f0f0; font-family: sans-serif; }
+        canvas { display: block; background: #ffffff; }
+        #status { position: absolute; top: 10px; left: 10px; pointer-events: none; color: #888; font-size: 12px; }
     </style>
 </head>
 <body>
-    <canvas id="drawingCanvas"></canvas>
-
+    <div id="status">Підключення...</div>
+    <canvas id="c"></canvas>
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-
-        const canvas = document.getElementById('drawingCanvas');
+        const canvas = document.getElementById('c');
         const ctx = canvas.getContext('2d');
+        const status = document.getElementById('status');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const ws = new WebSocket(`${protocol}://${window.location.host}/ws`);
 
-        // Підключаємося до WebSocket сервера
-        // Якщо сервер працює по https, використовуємо wss://, якщо локально - ws://
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
-        const ws = new WebSocket(wsUrl);
+        let drawing = false;
+        let last = {x: 0, y: 0};
 
-        // Малюємо лінію на екрані
-        const drawLine = (x0, y0, x1, y1, isRemote = false) => {
+        ws.onopen = () => status.innerText = "Онлайн (спільна дошка)";
+        ws.onclose = () => status.innerText = "Офлайн (перезавантажте)";
+
+        function draw(x0, y0, x1, y1, color, emit) {
             ctx.beginPath();
             ctx.moveTo(x0, y0);
             ctx.lineTo(x1, y1);
-            ctx.strokeStyle = isRemote ? 'red' : 'black'; // Чужі лінії червоні, твої чорні
-            ctx.lineWidth = 5;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 4;
             ctx.lineCap = 'round';
             ctx.stroke();
-            ctx.closePath();
-        };
-
-        // Коли малюєш ти
-        const startDraw = (e) => {
-            isDrawing = true;
-            lastX = e.clientX || e.touches[0].clientX;
-            lastY = e.clientY || e.touches[0].clientY;
-        };
-
-        const stopDraw = () => isDrawing = false;
-
-        const drawing = (e) => {
-            if (!isDrawing) return;
-            let currentX = e.clientX || e.touches[0].clientX;
-            let currentY = e.clientY || e.touches[0].clientY;
-
-            drawLine(lastX, lastY, currentX, currentY, false);
-
-            // Відправляємо координати на сервер
-            if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    x0: lastX, y0: lastY, x1: currentX, y1: currentY
-                }));
+            if(emit && ws.readyState === 1) {
+                ws.send(JSON.stringify({x0, y0, x1, y1}));
             }
+        }
 
-            lastX = currentX;
-            lastY = currentY;
+        const getPos = (e) => {
+            const t = e.touches ? e.touches[0] : e;
+            return {x: t.clientX, y: t.clientY};
         };
 
-        // Коли приходять координати від інших
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            drawLine(data.x0, data.y0, data.x1, data.y1, true);
+        canvas.onmousedown = canvas.ontouchstart = (e) => {
+            drawing = true;
+            last = getPos(e);
         };
 
-        canvas.addEventListener('mousedown', startDraw);
-        canvas.addEventListener('mouseup', stopDraw);
-        canvas.addEventListener('mousemove', drawing);
-        canvas.addEventListener('touchstart', startDraw);
-        canvas.addEventListener('touchend', stopDraw);
-        canvas.addEventListener('touchmove', drawing);
+        window.onmouseup = window.ontouchend = () => drawing = false;
+
+        canvas.onmousemove = canvas.ontouchmove = (e) => {
+            if(!drawing) return;
+            const curr = getPos(e);
+            draw(last.x, last.y, curr.x, curr.y, '#000000', true);
+            last = curr;
+        };
+
+        ws.onmessage = (e) => {
+            const d = JSON.parse(e.data);
+            draw(d.x0, d.y0, d.x1, d.y1, '#ff4444', false); // Чужі лінії - червоні
+        };
     </script>
 </body>
 </html>
