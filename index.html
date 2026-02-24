@@ -3,111 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Малювалка</title>
+    <title>Спільна Малювалка</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Дизайн підлаштовується під тему Telegram */
-        body { 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; 
-            background-color: var(--tg-theme-bg-color, #ffffff); 
-            color: var(--tg-theme-text-color, #000000); 
-        }
-        canvas { 
-            display: block; 
-            touch-action: none; /* Забороняє скролінг сторінки під час малювання */
-        } 
-        .controls { 
-            position: absolute; 
-            bottom: 20px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            display: flex; 
-            gap: 10px; 
-        }
-        button { 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 8px; 
-            background-color: var(--tg-theme-button-color, #3390ec); 
-            color: var(--tg-theme-button-text-color, #ffffff); 
-            font-size: 16px; 
-            cursor: pointer; 
-        }
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #ffffff; }
+        canvas { display: block; touch-action: none; }
     </style>
 </head>
 <body>
     <canvas id="drawingCanvas"></canvas>
-    
-    <div class="controls">
-        <button id="clearBtn">Очистити</button>
-        <button id="closeBtn">Закрити</button>
-    </div>
 
     <script>
-        // Ініціалізація Telegram Web App
         let tg = window.Telegram.WebApp;
-        tg.expand(); // Розгортаємо на весь екран
+        tg.expand();
 
         const canvas = document.getElementById('drawingCanvas');
         const ctx = canvas.getContext('2d');
-        
-        // Робимо полотно на весь екран
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
         let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
 
-        // Початок малювання
-        const startPosition = (e) => {
-            isDrawing = true;
-            draw(e);
-        };
+        // Підключаємося до WebSocket сервера
+        // Якщо сервер працює по https, використовуємо wss://, якщо локально - ws://
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
+        const ws = new WebSocket(wsUrl);
 
-        // Кінець малювання
-        const stopPosition = () => {
-            isDrawing = false;
-            ctx.beginPath(); // Починаємо новий шлях, щоб лінії не з'єднувались
-        };
-
-        // Функція малювання (підтримує і мишку, і сенсор)
-        const draw = (e) => {
-            if (!isDrawing) return;
-            
+        // Малюємо лінію на екрані
+        const drawLine = (x0, y0, x1, y1, isRemote = false) => {
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.strokeStyle = isRemote ? 'red' : 'black'; // Чужі лінії червоні, твої чорні
             ctx.lineWidth = 5;
             ctx.lineCap = 'round';
-            // Колір пензля беремо з кольору тексту теми Telegram
-            ctx.strokeStyle = tg.themeParams.text_color || '#000000'; 
-
-            let clientX = e.clientX || e.touches[0].clientX;
-            let clientY = e.clientY || e.touches[0].clientY;
-
-            ctx.lineTo(clientX, clientY);
             ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(clientX, clientY);
+            ctx.closePath();
         };
 
-        // Обробники подій для мишки (ПК)
-        canvas.addEventListener('mousedown', startPosition);
-        canvas.addEventListener('mouseup', stopPosition);
-        canvas.addEventListener('mousemove', draw);
+        // Коли малюєш ти
+        const startDraw = (e) => {
+            isDrawing = true;
+            lastX = e.clientX || e.touches[0].clientX;
+            lastY = e.clientY || e.touches[0].clientY;
+        };
 
-        // Обробники подій для сенсора (Смартфони)
-        canvas.addEventListener('touchstart', startPosition);
-        canvas.addEventListener('touchend', stopPosition);
-        canvas.addEventListener('touchmove', draw);
+        const stopDraw = () => isDrawing = false;
 
-        // Кнопка очищення
-        document.getElementById('clearBtn').addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
+        const drawing = (e) => {
+            if (!isDrawing) return;
+            let currentX = e.clientX || e.touches[0].clientX;
+            let currentY = e.clientY || e.touches[0].clientY;
 
-        // Кнопка закриття додатка
-        document.getElementById('closeBtn').addEventListener('click', () => {
-            tg.close();
-        });
+            drawLine(lastX, lastY, currentX, currentY, false);
+
+            // Відправляємо координати на сервер
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    x0: lastX, y0: lastY, x1: currentX, y1: currentY
+                }));
+            }
+
+            lastX = currentX;
+            lastY = currentY;
+        };
+
+        // Коли приходять координати від інших
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            drawLine(data.x0, data.y0, data.x1, data.y1, true);
+        };
+
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mouseup', stopDraw);
+        canvas.addEventListener('mousemove', drawing);
+        canvas.addEventListener('touchstart', startDraw);
+        canvas.addEventListener('touchend', stopDraw);
+        canvas.addEventListener('touchmove', drawing);
     </script>
 </body>
 </html>
