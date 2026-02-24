@@ -3,45 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OLX Clone</title>
+    <title>Маркетплейс</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --olx-green: #002f34;
-            --bright-green: #388e3c;
-            --bg-gray: #f2f4f5;
-            --text-gray: #7f9799;
+            --primary-text: #222;
+            --secondary-text: #707579;
+            --bg-main: #F4F6F8;
+            --bg-card: #FFFFFF;
+            --accent-green: #3A8354;
+            --accent-green-hover: #2D6A42;
+            --border-color: #E0E5E9;
+            --badge-bg: #5B926C;
         }
 
         body {
             margin: 0;
-            font-family: 'Roboto', sans-serif;
-            background: var(--bg-gray);
-            color: var(--olx-green);
-            padding-bottom: 70px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-main);
+            color: var(--primary-text);
+            padding-bottom: 85px; /* Місце для нижньої панелі */
+            -webkit-font-smoothing: antialiased;
         }
 
-        .page { display: none; min-height: 100vh; }
+        * { box-sizing: border-box; }
+
+        .page { display: none; min-height: 100vh; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
 
-        /* Header */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* === Header === */
         .header {
-            background: white;
-            padding: 15px;
+            background: var(--bg-card);
+            padding: 15px 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
+
+        .header-title { font-size: 18px; font-weight: 600; flex: 1; text-align: center; }
 
         .search-box {
             flex: 1;
-            background: #ebf1f1;
-            border-radius: 8px;
-            padding: 8px 12px;
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -52,149 +64,214 @@
             background: transparent;
             outline: none;
             width: 100%;
-            font-size: 16px;
+            font-size: 15px;
+            color: var(--primary-text);
         }
 
-        /* Список товарів */
+        /* === Product Grid === */
+        .section-title { padding: 20px 20px 10px; font-size: 18px; font-weight: 600; margin: 0; }
+        
         .product-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            padding: 10px;
+            gap: 15px;
+            padding: 10px 20px;
         }
 
         .card {
-            background: white;
-            border-radius: 8px;
+            background: var(--bg-card);
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .badge-active {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--badge-bg);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
         }
 
         .card-img {
             width: 100%;
-            height: 120px;
-            background: #eee;
+            height: 140px;
+            background: #EAEAEA;
             object-fit: cover;
         }
 
-        .card-info { padding: 10px; }
-        .card-title { font-size: 14px; height: 34px; overflow: hidden; margin-bottom: 5px; }
-        .card-price { font-weight: bold; font-size: 16px; color: var(--olx-green); }
-        .card-location { font-size: 11px; color: var(--text-gray); margin-top: 5px; }
+        .card-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; line-height: 1.3; color: var(--primary-text); }
+        .card-price { font-weight: 700; font-size: 16px; color: var(--accent-green); margin-top: auto; }
+        .card-location { font-size: 12px; color: var(--secondary-text); margin-top: 6px; }
 
-        /* Профіль (за твоїм дизайном) */
+        /* === Profile Page (Згідно зі скріншотом) === */
         .profile-header {
-            background: white;
-            padding: 30px 20px 20px;
+            background: var(--bg-card);
+            padding: 30px 20px 25px;
             text-align: center;
-            border-bottom: 8px solid var(--bg-gray);
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
         }
 
         .profile-avatar {
-            width: 90px;
-            height: 90px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            border: 3px solid var(--bright-green);
+            border: 3px solid var(--accent-green);
             margin: 0 auto 15px;
-            overflow: hidden;
+            padding: 3px;
         }
-
-        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         
-        .profile-name { font-size: 22px; font-weight: bold; margin: 0; }
-        .profile-tag { color: var(--text-gray); font-size: 14px; margin-bottom: 15px; }
+        .profile-name { font-size: 22px; font-weight: 700; margin: 0 0 5px; }
+        .profile-tag { color: var(--secondary-text); font-size: 15px; margin: 0 0 15px; }
 
-        .edit-profile-btn {
-            background: var(--bright-green);
+        .btn-edit-profile {
+            background: var(--accent-green);
             color: white;
             border: none;
-            padding: 10px 25px;
-            border-radius: 25px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
         }
+        .btn-edit-profile:hover { background: var(--accent-green-hover); }
 
-        .stats-row {
+        .stats-card {
+            background: var(--bg-card);
+            margin: 15px 20px;
+            border-radius: 16px;
             display: flex;
             justify-content: space-around;
-            background: white;
-            padding: 20px 0;
-            border-bottom: 1px solid #eee;
+            padding: 20px 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
-        .stat-item { text-align: center; }
-        .stat-num { font-weight: bold; font-size: 18px; }
-        .stat-label { font-size: 12px; color: var(--text-gray); }
+        .stat-item { text-align: center; flex: 1; border-right: 1px solid var(--border-color); }
+        .stat-item:last-child { border-right: none; }
+        .stat-num { font-weight: 700; font-size: 20px; color: var(--accent-green); margin-bottom: 4px; }
+        .stat-label { font-size: 13px; color: var(--secondary-text); font-weight: 500; }
+        .star-icon { color: #F5A623; font-size: 16px; }
 
-        .menu-list { background: white; margin-top: 10px; }
-        .menu-item {
-            padding: 15px 20px;
+        .settings-list {
+            background: var(--bg-card);
+            margin: 15px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+        .settings-item {
+            padding: 16px 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #eee;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            color: var(--primary-text);
+            font-weight: 500;
         }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item:active { background: var(--bg-main); }
+        .settings-icon-left { width: 30px; color: var(--accent-green); font-size: 18px; }
+        .settings-icon-right { color: #C7C7CC; }
 
-        /* Форма додавання */
-        .form-container { background: white; padding: 20px; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; color: var(--olx-green); }
-        input, select, textarea {
+        /* === Add Product Form === */
+        .form-container { padding: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--primary-text); }
+        .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ced4d4;
-            border-radius: 4px;
-            background: #f2f4f5;
-            box-sizing: border-box;
-            font-size: 16px;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-card);
+            font-size: 15px;
+            transition: 0.2s;
+            outline: none;
         }
-
-        .submit-btn {
-            background: var(--bright-green);
+        .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent-green); }
+        
+        .btn-submit {
+            background: var(--accent-green);
             color: white;
             border: none;
             width: 100%;
             padding: 16px;
-            border-radius: 4px;
-            font-weight: bold;
+            border-radius: 12px;
+            font-weight: 600;
             font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(58, 131, 84, 0.3);
         }
 
-        /* Навігація */
+        /* === Bottom Navigation (Дизайн зі скріншоту) === */
         .nav-bar {
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: white;
+            background: var(--bg-card);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 10px 0;
-            border-top: 1px solid #ddd;
-            height: 65px;
+            height: 70px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
             z-index: 1000;
         }
 
-        .nav-item { text-align: center; color: var(--olx-green); font-size: 12px; flex: 1; cursor: pointer; }
-        .nav-item i { font-size: 24px; margin-bottom: 4px; }
-        .nav-item.active { color: var(--bright-green); }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--secondary-text);
+            font-size: 12px;
+            font-weight: 500;
+            flex: 1;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .nav-item i { font-size: 22px; margin-bottom: 6px; }
+        .nav-item.active { color: var(--accent-green); }
 
-        .add-placeholder {
-            width: 60px;
-            height: 60px;
-            background: white;
+        .nav-add-btn {
+            width: 65px;
+            height: 65px;
+            background: var(--bg-card);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: -40px;
-            border: 1px solid #eee;
-            box-shadow: 0 -3px 10px rgba(0,0,0,0.05);
+            margin-top: -35px; /* Виступає вгору */
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            position: relative;
+        }
+        /* Внутрішнє зелене коло */
+        .nav-add-btn::after {
+            content: '+';
+            font-size: 40px;
+            color: var(--accent-green);
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
         }
 
-        .add-placeholder i { font-size: 35px; color: var(--bright-green); margin: 0; }
     </style>
 </head>
 <body>
@@ -202,141 +279,244 @@
     <div id="home-page" class="page active">
         <div class="header">
             <div class="search-box">
-                <i class="fa fa-search"></i>
-                <input type="text" placeholder="Пошук товарів...">
-                <i class="fa fa-microphone" style="color: var(--bright-green)"></i>
+                <i class="fa fa-search" style="color: var(--secondary-text)"></i>
+                <input type="text" id="search-input" placeholder="Пошук товарів..." onkeyup="filterProducts()">
             </div>
         </div>
-        <div id="items-list" class="product-grid"></div>
+        <div id="home-items-list" class="product-grid">
+            </div>
     </div>
 
     <div id="add-page" class="page">
         <div class="header">
-            <i class="fa fa-arrow-left" onclick="showPage('home-page')"></i>
-            <b style="flex:1; text-align:center; margin-right: 20px;">Створити оголошення</b>
+            <div class="header-title">Створити оголошення</div>
         </div>
         <div class="form-container">
-            <label>Посилання на фото (URL)*</label>
-            <input type="text" id="p-img" placeholder="https://image.com/photo.jpg">
-
-            <label>Назва товару*</label>
-            <input type="text" id="p-title" placeholder="Наприклад: Ноутбук Asus">
-
-            <label>Ціна (грн)*</label>
-            <input type="number" id="p-price" placeholder="0">
-
-            <label>Область*</label>
-            <select id="p-region">
-                <option value="Київська область">Київська область</option>
-                <option value="Харківська область">Харківська область</option>
-                <option value="Львівська область">Львівська область</option>
-                <option value="Одеська область">Одеська область</option>
-                <option value="Дніпропетровська область">Дніпропетровська область</option>
-            </select>
-
-            <label>Місто*</label>
-            <input type="text" id="p-city" placeholder="Введіть ваше місто">
-
-            <label>Опис товару*</label>
-            <textarea id="p-desc" rows="5" placeholder="Розкажіть про товар детальніше..."></textarea>
-
-            <button class="submit-btn" onclick="saveProduct()">Опублікувати</button>
+            <div class="form-group">
+                <label class="form-label">Назва товару*</label>
+                <input type="text" id="p-title" class="form-input" placeholder="Наприклад: Ноутбук Asus">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ціна (грн)*</label>
+                <input type="number" id="p-price" class="form-input" placeholder="15000">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Посилання на фото</label>
+                <input type="text" id="p-img" class="form-input" placeholder="https://...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Місто*</label>
+                <input type="text" id="p-city" class="form-input" placeholder="Київ">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Опис товару</label>
+                <textarea id="p-desc" class="form-textarea" rows="4" placeholder="Розкажіть про товар..."></textarea>
+            </div>
+            <button class="btn-submit" onclick="saveProduct()">Опублікувати</button>
         </div>
     </div>
 
     <div id="profile-page" class="page">
         <div class="profile-header">
             <div class="profile-avatar">
-                <img src="https://via.placeholder.com/150" id="profile-pic">
+                <img src="https://i.pravatar.cc/150?img=11" alt="Avatar">
             </div>
-            <p class="profile-name">Roman</p>
+            <h2 class="profile-name">Roman</h2>
             <p class="profile-tag">@landeshuu</p>
-            <button class="edit-profile-btn">Редагувати профіль <i class="fa fa-pencil"></i></button>
+            <button class="btn-edit-profile" onclick="alert('Відкрито редагування профілю!')">
+                Редагувати профіль <i class="fa fa-pencil" style="margin-left: 5px;"></i>
+            </button>
         </div>
 
-        <div class="stats-row">
-            <div class="stat-item"><div class="stat-num">12</div><div class="stat-label">Товари</div></div>
-            <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Продано</div></div>
-            <div class="stat-item"><div class="stat-num" style="color: #f1c40f;">4.8 ★</div><div class="stat-label">Рейтинг</div></div>
+        <div class="stats-card">
+            <div class="stat-item">
+                <div class="stat-num" id="stat-total">12</div>
+                <div class="stat-label">Товари</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">5</div>
+                <div class="stat-label">Продано</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num"><i class="fa fa-star star-icon"></i> 4.8</div>
+                <div class="stat-label">Рейтинг</div>
+            </div>
         </div>
 
-        <div class="menu-list">
-            <div class="menu-item"><span><i class="fa fa-cog"></i> Налаштування</span><i class="fa fa-chevron-right"></i></div>
-            <div class="menu-item"><span><i class="fa fa-credit-card"></i> Платежі</span><i class="fa fa-chevron-right"></i></div>
-            <div class="menu-item"><span><i class="fa fa-box"></i> Мої замовлення</span><i class="fa fa-chevron-right"></i></div>
+        <h3 class="section-title">Мої товари</h3>
+        <div id="profile-items-list" class="product-grid">
+            </div>
+
+        <h3 class="section-title">Налаштування</h3>
+        <div class="settings-list">
+            <div class="settings-item" onclick="alert('Налаштування')">
+                <div style="display:flex; align-items:center;">
+                    <i class="fa fa-cog settings-icon-left"></i> Налаштування
+                </div>
+                <i class="fa fa-chevron-right settings-icon-right"></i>
+            </div>
+            <div class="settings-item" onclick="alert('Платежі')">
+                <div style="display:flex; align-items:center;">
+                    <i class="fa fa-credit-card settings-icon-left"></i> Платежі
+                </div>
+                <i class="fa fa-chevron-right settings-icon-right"></i>
+            </div>
+            <div class="settings-item" onclick="alert('Мої замовлення')">
+                <div style="display:flex; align-items:center;">
+                    <i class="fa fa-box settings-icon-left"></i> Мої замовлення
+                </div>
+                <i class="fa fa-chevron-right settings-icon-right"></i>
+            </div>
         </div>
+        <br>
     </div>
 
     <div class="nav-bar">
-        <div class="nav-item active" onclick="showPage('home-page', this)">
-            <i class="fa fa-home"></i><br>Головна
+        <div class="nav-item active" id="nav-home" onclick="showPage('home-page', 'nav-home')">
+            <i class="fa fa-home"></i> Головна
         </div>
-        <div class="nav-item" onclick="showPage('add-page', this)">
-            <div class="add-placeholder">
-                <i class="fa fa-plus"></i>
-            </div>
-        </div>
-        <div class="nav-item" onclick="showPage('profile-page', this)">
-            <i class="fa fa-user"></i><br>Профіль
+        
+        <div class="nav-add-btn" onclick="showPage('add-page', null)"></div>
+        
+        <div class="nav-item" id="nav-profile" onclick="showPage('profile-page', 'nav-profile')">
+            <i class="fa fa-user"></i> Профіль
         </div>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+        // Ініціалізація Telegram Web App (якщо відкрито в TG)
+        let tg = window.Telegram ? window.Telegram.WebApp : null;
+        if(tg) tg.expand();
 
-        const ws = new WebSocket(`${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`);
+        // Базові товари для демонстрації (якщо в браузері ще нічого не збережено)
+        const defaultProducts = [
+            { id: 1, title: "Нові Кросівки", price: "1 200", city: "Київ", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
+            { id: 2, title: "Ноутбук ASUS", price: "15 500", city: "Львів", img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&q=80" }
+        ];
 
-        function showPage(pageId, el) {
+        // Завантаження товарів з LocalStorage або використання дефолтних
+        let products = JSON.parse(localStorage.getItem('olx_products')) || defaultProducts;
+
+        function saveProductsToStorage() {
+            localStorage.setItem('olx_products', JSON.stringify(products));
+        }
+
+        // Перемикання сторінок
+        function showPage(pageId, navId) {
+            // Ховаємо всі сторінки
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Показуємо потрібну
             document.getElementById(pageId).classList.add('active');
-            if(el) {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                el.classList.add('active');
+            
+            // Оновлюємо активну кнопку навігації
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            if(navId) {
+                document.getElementById(navId).classList.add('active');
             }
-            if(pageId === 'home-page') loadProducts();
+
+            // Оновлюємо контент залежно від сторінки
+            if(pageId === 'home-page') renderProducts();
+            if(pageId === 'profile-page') renderProfileProducts();
+            
+            // Скролимо нагору
+            window.scrollTo(0, 0);
         }
 
-        async function loadProducts() {
-            try {
-                const res = await fetch('/api/products');
-                const products = await res.json();
-                const list = document.getElementById('items-list');
-                list.innerHTML = products.map(p => `
-                    <div class="card">
-                        <img src="${p.img || 'https://via.placeholder.com/150'}" class="card-img">
-                        <div class="card-info">
-                            <div class="card-title">${p.title}</div>
-                            <div class="card-price">${p.price} грн</div>
-                            <div class="card-location">${p.city}, ${p.region.split(' ')[0]}</div>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) { console.log(e); }
-        }
+        // Рендер товарів на Головній сторінці
+        function renderProducts(filterText = '') {
+            const list = document.getElementById('home-items-list');
+            
+            const filtered = products.filter(p => 
+                p.title.toLowerCase().includes(filterText.toLowerCase()) || 
+                p.city.toLowerCase().includes(filterText.toLowerCase())
+            );
 
-        function saveProduct() {
-            const title = document.getElementById('p-title').value;
-            const price = document.getElementById('p-price').value;
-            const desc = document.getElementById('p-desc').value;
-            const img = document.getElementById('p-img').value;
-            const city = document.getElementById('p-city').value;
-            const region = document.getElementById('p-region').value;
-
-            if(!title || !price || !city || !desc) {
-                tg.showAlert("Заповніть усі обов'язкові поля!");
+            if(filtered.length === 0) {
+                list.innerHTML = `<p style="grid-column: span 2; text-align: center; color: var(--secondary-text);">Товарів не знайдено</p>`;
                 return;
             }
 
-            if(ws.readyState === 1) {
-                ws.send(JSON.stringify({type: 'new_product', title, price, desc, img, city, region}));
-                tg.showAlert("Оголошення опубліковано!");
-                showPage('home-page');
-            }
+            list.innerHTML = filtered.map(p => `
+                <div class="card">
+                    <img src="${p.img || 'https://via.placeholder.com/300?text=Немає+фото'}" class="card-img" alt="Product">
+                    <div class="card-info">
+                        <div class="card-title">${p.title}</div>
+                        <div class="card-price">${p.price} грн</div>
+                        <div class="card-location"><i class="fa fa-map-marker-alt" style="font-size:10px; margin-right:3px;"></i> ${p.city}</div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        window.onload = loadProducts;
-        ws.onopen = loadProducts;
+        // Рендер товарів у Профілі (з бейджиком "Активний")
+        function renderProfileProducts() {
+            const list = document.getElementById('profile-items-list');
+            document.getElementById('stat-total').innerText = products.length; // Оновлюємо статистику
+
+            list.innerHTML = products.map(p => `
+                <div class="card">
+                    <div class="badge-active">Активний</div>
+                    <img src="${p.img || 'https://via.placeholder.com/300?text=Немає+фото'}" class="card-img" alt="Product">
+                    <div class="card-info">
+                        <div class="card-title">${p.title}</div>
+                        <div class="card-price">${p.price} грн</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Пошук (фільтрація)
+        function filterProducts() {
+            const text = document.getElementById('search-input').value;
+            renderProducts(text);
+        }
+
+        // Збереження нового товару
+        function saveProduct() {
+            const title = document.getElementById('p-title').value.trim();
+            const price = document.getElementById('p-price').value.trim();
+            const city = document.getElementById('p-city').value.trim();
+            const img = document.getElementById('p-img').value.trim();
+            
+            if(!title || !price || !city) {
+                if(tg) tg.showAlert("Заповніть назву, ціну та місто!");
+                else alert("Заповніть назву, ціну та місто!");
+                return;
+            }
+
+            // Додаємо в масив
+            products.unshift({
+                id: Date.now(),
+                title: title,
+                price: price,
+                city: city,
+                img: img
+            });
+
+            // Зберігаємо локально
+            saveProductsToStorage();
+
+            // Очищаємо форму
+            document.getElementById('p-title').value = '';
+            document.getElementById('p-price').value = '';
+            document.getElementById('p-city').value = '';
+            document.getElementById('p-img').value = '';
+            document.getElementById('p-desc').value = '';
+
+            // Показуємо повідомлення і переходимо на головну
+            if(tg && tg.showAlert) {
+                tg.showAlert("Оголошення успішно опубліковано!");
+            } else {
+                alert("Оголошення успішно опубліковано!");
+            }
+            
+            showPage('home-page', 'nav-home');
+        }
+
+        // Початковий запуск
+        window.onload = () => {
+            renderProducts();
+        };
     </script>
 </body>
 </html>
