@@ -41,7 +41,7 @@
             padding-bottom: 85px;
             -webkit-font-smoothing: antialiased;
             transition: background 0.3s, color 0.3s;
-            overscroll-behavior-y: contain; /* Для кастомного pull-to-refresh */
+            overscroll-behavior-y: contain;
         }
 
         * { box-sizing: border-box; }
@@ -51,132 +51,59 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* === Header === */
-        .header {
-            background: var(--bg-card);
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-            transition: background 0.3s;
-        }
-
+        /* === Header & Filters === */
+        .header { background: var(--bg-card); padding: 15px 20px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: background 0.3s; }
         .header-title { font-size: 18px; font-weight: 600; flex: 1; text-align: center; }
-
-        .search-box {
-            flex: 1;
-            background: var(--input-bg);
-            border-radius: 12px;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .search-box { flex: 1; background: var(--input-bg); border-radius: 12px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
         .search-box input { border: none; background: transparent; outline: none; width: 100%; font-size: 15px; color: var(--primary-text); }
-
-        /* === Filters === */
-        .filters-wrapper {
-            background: var(--bg-card);
-            padding: 10px 20px;
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            white-space: nowrap;
-            scrollbar-width: none; /* Firefox */
-        }
+        .filters-wrapper { background: var(--bg-card); padding: 10px 20px; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
         .filters-wrapper::-webkit-scrollbar { display: none; }
-        
-        .filter-chip {
-            padding: 8px 16px;
-            background: var(--input-bg);
-            color: var(--secondary-text);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .filter-chip { padding: 8px 16px; background: var(--input-bg); color: var(--secondary-text); border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.2s; }
         .filter-chip.active { background: var(--accent-green); color: white; }
 
-        /* === Pull to Refresh === */
-        #ptr-indicator {
-            text-align: center;
-            padding: 15px;
-            color: var(--secondary-text);
-            font-size: 14px;
-            display: none;
-        }
+        #ptr-indicator { text-align: center; padding: 15px; color: var(--secondary-text); font-size: 14px; display: none; }
 
         /* === Product Grid === */
         .section-title { padding: 20px 20px 10px; font-size: 18px; font-weight: 600; margin: 0; }
-        
         .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px 20px; }
-
-        .card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            transition: background 0.3s;
-        }
-
+        .card { background: var(--bg-card); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; transition: background 0.3s; }
         .badge-active { position: absolute; top: 10px; left: 10px; background: var(--badge-bg); color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
-        
         .card-img { width: 100%; height: 140px; background: #EAEAEA; object-fit: cover; }
-        
         .card-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
         .card-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; line-height: 1.3; color: var(--primary-text); }
         .card-price { font-weight: 700; font-size: 16px; color: var(--accent-green); margin-top: auto; }
         .card-location { font-size: 12px; color: var(--secondary-text); margin-top: 6px; }
-
-        /* Статистика на карточці профілю */
         .card-stats { display: flex; gap: 10px; margin-top: 8px; font-size: 11px; color: var(--secondary-text); }
         .card-stats i { margin-right: 3px; }
 
-        /* === Profile Page === */
+        /* === Profile & Forms === */
         .profile-header { background: var(--bg-card); padding: 30px 20px 25px; text-align: center; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; transition: background 0.3s; }
-        
         .profile-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent-green); margin: 0 auto 15px; padding: 3px; position: relative; }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        
         .profile-name { font-size: 22px; font-weight: 700; margin: 0 0 5px; }
         .profile-tag { color: var(--secondary-text); font-size: 15px; margin: 0 0 15px; }
-
         .btn-edit-profile { background: var(--accent-green); color: white; border: none; padding: 10px 24px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
-        
         .stats-card { background: var(--bg-card); margin: 15px 20px; border-radius: 16px; display: flex; justify-content: space-around; padding: 20px 10px; }
         .stat-item { text-align: center; flex: 1; border-right: 1px solid var(--border-color); }
         .stat-item:last-child { border-right: none; }
         .stat-num { font-weight: 700; font-size: 20px; color: var(--accent-green); margin-bottom: 4px; }
         .stat-label { font-size: 13px; color: var(--secondary-text); font-weight: 500; }
-
         .settings-list { background: var(--bg-card); margin: 15px 20px; border-radius: 16px; overflow: hidden; }
         .settings-item { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); cursor: pointer; color: var(--primary-text); font-weight: 500; }
         .settings-item:last-child { border-bottom: none; }
         .settings-icon-left { width: 30px; color: var(--accent-green); font-size: 18px; }
 
-        /* === Form Elements === */
         .form-container { padding: 20px; }
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--primary-text); }
         .form-input, .form-select, .form-textarea { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--input-bg); color: var(--primary-text); font-size: 15px; outline: none; }
-        
-        /* Кастомний input для файлу */
         .file-upload-wrapper { position: relative; width: 100%; height: 120px; border: 2px dashed var(--border-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--input-bg); cursor: pointer; overflow: hidden; }
         .file-upload-wrapper input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
         .file-upload-text { color: var(--secondary-text); font-size: 14px; text-align: center; pointer-events: none; }
         .preview-img { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
+        .btn-submit { background: var(--accent-green); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .btn-submit:active { transform: scale(0.98); }
 
-        .btn-submit { background: var(--accent-green); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; }
-
-        /* === Toggle Switch === */
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
@@ -184,16 +111,35 @@
         input:checked + .slider { background-color: var(--accent-green); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        /* === Bottom Navigation === */
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; height: 70px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 1000; transition: background 0.3s; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--secondary-text); font-size: 12px; font-weight: 500; flex: 1; cursor: pointer; }
         .nav-item i { font-size: 22px; margin-bottom: 6px; }
         .nav-item.active { color: var(--accent-green); }
-        
         .nav-add-btn { width: 65px; height: 65px; background: var(--nav-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -35px; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: background 0.3s; }
         .nav-add-btn::after { content: '+'; font-size: 40px; color: var(--accent-green); font-weight: 300; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; }
-
         .back-btn { background: none; border: none; color: var(--primary-text); font-size: 20px; cursor: pointer; }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--bg-card); padding: 25px; border-radius: 24px; width: 85%; max-width: 340px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Modal Buttons (Ad) */
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; font-size: 15px; }
+        .btn-cancel { background: var(--input-bg); color: var(--primary-text); }
+        .modal-title { margin: 0 0 10px; font-size: 18px; color: var(--primary-text); }
+        .modal-desc { margin: 0; color: var(--secondary-text); font-size: 14px; line-height: 1.4; }
+
+        /* Success Animation Modal */
+        .close-modal-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 22px; color: var(--secondary-text); cursor: pointer; }
+        .success-animation { position: relative; width: 80px; height: 80px; margin: 10px auto 20px; }
+        .spin-circle { position: absolute; width: 100%; height: 100%; border: 4px solid var(--input-bg); border-top: 4px solid var(--accent-green); border-radius: 50%; animation: spin 1s linear infinite; }
+        .checkmark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 40px; color: var(--accent-green); animation: checkPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; animation-delay: 0.3s; }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes checkPop { from { transform: translate(-50%, -50%) scale(0); } to { transform: translate(-50%, -50%) scale(1); } }
     </style>
 </head>
 <body>
@@ -205,7 +151,6 @@
                 <input type="text" id="search-input" placeholder="Пошук товарів..." onkeyup="filterProducts()">
             </div>
         </div>
-        
         <div class="filters-wrapper" id="category-filters">
             <div class="filter-chip active" onclick="setCategory('Всі', this)">Всі</div>
             <div class="filter-chip" onclick="setCategory('Електроніка', this)">Електроніка</div>
@@ -213,9 +158,7 @@
             <div class="filter-chip" onclick="setCategory('Авто', this)">Авто</div>
             <div class="filter-chip" onclick="setCategory('Дім', this)">Для дому</div>
         </div>
-
         <div id="ptr-indicator"><i class="fa fa-sync fa-spin"></i> Оновлення стрічки...</div>
-
         <div id="home-items-list" class="product-grid"></div>
     </div>
 
@@ -232,7 +175,6 @@
                     <input type="file" id="p-img" accept="image/*" onchange="previewImage(this, 'add-img-preview', 'add-img-text')">
                 </div>
             </div>
-            
             <div class="form-group">
                 <label class="form-label">Категорія*</label>
                 <select id="p-category" class="form-select">
@@ -242,7 +184,6 @@
                     <option value="Дім">Для дому</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label class="form-label">Назва товару*</label>
                 <input type="text" id="p-title" class="form-input" placeholder="Наприклад: Ноутбук Asus">
@@ -259,7 +200,7 @@
                 <label class="form-label">Опис товару</label>
                 <textarea id="p-desc" class="form-textarea" rows="4" placeholder="Можна вставити готовий текст..."></textarea>
             </div>
-            <button class="btn-submit" onclick="saveProduct()">Опублікувати</button>
+            <button class="btn-submit" onclick="attemptSaveProduct()">Опублікувати</button>
         </div>
     </div>
 
@@ -298,7 +239,8 @@
         <div class="header">
             <button class="back-btn" onclick="showPage('profile-page', 'nav-profile')"><i class="fa fa-arrow-left"></i></button>
             <div class="header-title">Редагувати профіль</div>
-            <div style="width:20px;"></div> </div>
+            <div style="width:20px;"></div> 
+        </div>
         <div class="form-container">
             <div class="form-group">
                 <label class="form-label">Аватарка (Галерея)</label>
@@ -341,6 +283,28 @@
         </div>
     </div>
 
+    <div id="ad-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title">🔥 Швидкий продаж</h3>
+            <p class="modal-desc">Ви бажаєте купити рекламу на товар, щоб продати його набагато швидше?</p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="handleAdChoice(false)">Ні</button>
+                <button class="btn-submit" onclick="handleAdChoice(true)" style="margin-top:0;">Так</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal-btn" onclick="closeSuccessModal()"><i class="fa fa-times"></i></button>
+            <div class="success-animation">
+                <div class="spin-circle"></div>
+                <i class="fa fa-check checkmark"></i>
+            </div>
+            <h3 class="modal-title" style="margin-bottom: 0;">Товар виставлений!</h3>
+        </div>
+    </div>
+
     <div class="nav-bar">
         <div class="nav-item active" id="nav-home" onclick="showPage('home-page', 'nav-home')">
             <i class="fa fa-home"></i> Головна
@@ -358,7 +322,7 @@
         let currentCategory = 'Всі';
         let userProfile = JSON.parse(localStorage.getItem('olx_user')) || { name: 'Roman', tag: '@landeshuu', avatar: 'https://i.pravatar.cc/150?img=11' };
 
-        // Дефолтні товари ВІД ІНШИХ ЛЮДЕЙ (вже виставлені)
+        // Дефолтні товари
         const mockProducts = [
             { id: 101, title: "iPhone 13 Pro 128GB", price: "28 000", city: "Київ", category: "Електроніка", img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400", isMine: false },
             { id: 102, title: "Велосипед гірський", price: "8 500", city: "Львів", category: "Авто", img: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=400", isMine: false },
@@ -377,7 +341,6 @@
         }
 
         // --- ФУНКЦІЇ НАВІГАЦІЇ ТА РЕНДЕРУ ---
-        
         function showPage(pageId, navId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
@@ -463,24 +426,61 @@
                     imgEl.src = e.target.result;
                     imgEl.style.display = 'block';
                     document.getElementById(textId).style.display = 'none';
-                    input.setAttribute('data-base64', e.target.result); // Зберігаємо код картинки
+                    input.setAttribute('data-base64', e.target.result);
                 }
                 reader.readAsDataURL(file);
             }
         }
 
-        // --- ЗБЕРЕЖЕННЯ ДАНИХ ---
-        function saveProduct() {
+        // --- ЛОГІКА ДОДАВАННЯ ТОВАРУ ТА МОДАЛОК ---
+        function attemptSaveProduct() {
+            const title = document.getElementById('p-title').value.trim();
+            const price = document.getElementById('p-price').value.trim();
+            const city = document.getElementById('p-city').value.trim();
+            const imgInput = document.getElementById('p-img');
+            const imgData = imgInput.getAttribute('data-base64');
+            
+            if(!title || !price || !city || !imgData) { 
+                if(tg && tg.showAlert) tg.showAlert("Заповніть назву, ціну, місто та додайте фото!"); 
+                else alert("Заповніть назву, ціну, місто та додайте фото!"); 
+                return; 
+            }
+
+            // Відкриваємо модалку реклами
+            document.getElementById('ad-modal').classList.add('active');
+        }
+
+        function handleAdChoice(wantAds) {
+            document.getElementById('ad-modal').classList.remove('active');
+            
+            // Зберігаємо товар у локальну "базу"
+            doFinalSave();
+
+            if (wantAds) {
+                if(tg && tg.showAlert) tg.showAlert("Оплата реклами в розробці. Товар виставлено звичайно!");
+                else alert("Оплата реклами в розробці. Товар виставлено звичайно!");
+                
+                showPage('profile-page', 'nav-profile');
+            } else {
+                // Відкриваємо гарне вікно "Товар виставлений"
+                document.getElementById('success-modal').classList.add('active');
+            }
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.remove('active');
+            showPage('profile-page', 'nav-profile');
+        }
+
+        function doFinalSave() {
             const title = document.getElementById('p-title').value.trim();
             const price = document.getElementById('p-price').value.trim();
             const city = document.getElementById('p-city').value.trim();
             const category = document.getElementById('p-category').value;
             const imgInput = document.getElementById('p-img');
             const imgData = imgInput.getAttribute('data-base64');
-            
-            if(!title || !price || !city || !imgData) { alert("Заповніть назву, ціну, місто та додайте фото!"); return; }
 
-            // Додаємо товар як "мій" і генеруємо рандомну статистику для вигляду
+            // Зберігаємо (тепер він буде видимий і на головній, бо зберігається у загальний масив products)
             products.unshift({
                 id: Date.now(), title, price, city, category, img: imgData, isMine: true,
                 views: Math.floor(Math.random() * 50) + 1,
@@ -494,9 +494,6 @@
             imgInput.value = ''; imgInput.removeAttribute('data-base64');
             document.getElementById('add-img-preview').style.display = 'none';
             document.getElementById('add-img-text').style.display = 'block';
-
-            if(tg && tg.showAlert) tg.showAlert("Опубліковано!"); else alert("Опубліковано!");
-            showPage('profile-page', 'nav-profile');
         }
 
         function loadProfileDataIntoForm() {
@@ -532,8 +529,9 @@
         }
 
         function openSupport() {
-            if(tg && tg.openTelegramLink) tg.openTelegramLink('https://t.me/mertin');
-            else window.location.href = 'https://t.me/mertin';
+            // Оновлений лінк на @mertin1
+            if(tg && tg.openTelegramLink) tg.openTelegramLink('https://t.me/mertin1');
+            else window.location.href = 'https://t.me/mertin1';
         }
 
         // --- PULL TO REFRESH (Свайп вниз для оновлення) ---
@@ -548,7 +546,6 @@
         }, {passive: true});
         homePage.addEventListener('touchend', () => {
             if(ptr.style.display === 'block') {
-                // Симуляція завантаження
                 setTimeout(() => { ptr.style.display = 'none'; renderProducts(); }, 1000);
             }
         });
