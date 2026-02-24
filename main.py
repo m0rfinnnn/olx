@@ -11,7 +11,7 @@ import uvicorn
 # --- НАЛАШТУВАННЯ ---
 BOT_TOKEN = "8483109575:AAHN0-ZVB37URDe4IXCNaRuKfFLBnUlSq-4"
 # Коли запустиш сервер (наприклад, на Render або Railway), сюди вставиш його адресу:
-WEB_APP_URL = "https://m0rfinnnn.github.io/olx/" 
+WEB_APP_URL = "https://olx-1-bou2.onrender.com" 
 
 # --- ТЕЛЕГРАМ БОТ ---
 bot = Bot(token=BOT_TOKEN)
