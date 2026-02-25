@@ -315,24 +315,30 @@
         </div>
     </div>
 
-    <script>
-        let tg = window.Telegram ? window.Telegram.WebApp : null;
-        if(tg) tg.expand();
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        let currentCategory = 'Всі';
-        let userProfile = JSON.parse(localStorage.getItem('olx_user')) || { name: 'Roman', tag: '@landeshuu', avatar: 'https://i.pravatar.cc/150?img=11' };
+        // ТВОЇ ДАНІ FIREBASE (ОБОВ'ЯЗКОВО ЗАМІНИ НА СВОЇ)
+        const firebaseConfig = {
+            apiKey: "ВСТАВ_СВІЙ_API_KEY",
+            authDomain: "твій-проект.firebaseapp.com",
+            projectId: "твій-проект",
+            storageBucket: "твій-проект.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "ВСТАВ_СВІЙ_APP_ID"
+        };
 
-        // Дефолтні товари
-        const mockProducts = [
-            { id: 101, title: "iPhone 13 Pro 128GB", price: "28 000", city: "Київ", category: "Електроніка", img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400", isMine: false },
-            { id: 102, title: "Велосипед гірський", price: "8 500", city: "Львів", category: "Авто", img: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=400", isMine: false },
-            { id: 103, title: "Стильна куртка Zara", price: "1 200", city: "Одеса", category: "Одяг", img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400", isMine: false },
-            { id: 104, title: "Диван розкладний", price: "5 400", city: "Дніпро", category: "Дім", img: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400", isMine: false }
-        ];
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        let products = JSON.parse(localStorage.getItem('olx_products')) || mockProducts;
+        // Робимо змінні глобальними для роботи з HTML
+        window.tg = window.Telegram ? window.Telegram.WebApp : null;
+        if(window.tg) window.tg.expand();
 
-        function saveProductsToStorage() { localStorage.setItem('olx_products', JSON.stringify(products)); }
+        window.currentCategory = 'Всі';
+        window.userProfile = JSON.parse(localStorage.getItem('olx_user')) || { name: 'Roman', tag: '@landeshuu', avatar: 'https://i.pravatar.cc/150?img=11' };
+        window.products = []; // Тепер масив порожній і заповнюється з Firebase
 
         // Завантаження теми
         if (localStorage.getItem('olx_theme') === 'dark') {
@@ -341,7 +347,7 @@
         }
 
         // --- ФУНКЦІЇ НАВІГАЦІЇ ТА РЕНДЕРУ ---
-        function showPage(pageId, navId) {
+        window.showPage = function(pageId, navId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             
@@ -350,28 +356,28 @@
                 document.getElementById(navId).classList.add('active');
             }
 
-            if(pageId === 'home-page') renderProducts();
-            if(pageId === 'profile-page') renderProfile();
-            if(pageId === 'edit-profile-page') loadProfileDataIntoForm();
+            if(pageId === 'home-page') window.renderProducts();
+            if(pageId === 'profile-page') window.renderProfile();
+            if(pageId === 'edit-profile-page') window.loadProfileDataIntoForm();
             window.scrollTo(0, 0);
         }
 
-        function setCategory(cat, el) {
-            currentCategory = cat;
+        window.setCategory = function(cat, el) {
+            window.currentCategory = cat;
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-            renderProducts();
+            window.renderProducts();
         }
 
-        function filterProducts() { renderProducts(); }
+        window.filterProducts = function() { window.renderProducts(); }
 
-        function renderProducts() {
+        window.renderProducts = function() {
             const list = document.getElementById('home-items-list');
             const searchText = document.getElementById('search-input').value.toLowerCase();
             
-            const filtered = products.filter(p => {
+            const filtered = window.products.filter(p => {
                 const matchText = p.title.toLowerCase().includes(searchText) || p.city.toLowerCase().includes(searchText);
-                const matchCat = (currentCategory === 'Всі') || (p.category === currentCategory);
+                const matchCat = (window.currentCategory === 'Всі') || (p.category === window.currentCategory);
                 return matchText && matchCat;
             });
 
@@ -389,13 +395,13 @@
             `).join('');
         }
 
-        function renderProfile() {
-            document.getElementById('user-name-display').innerText = userProfile.name;
-            document.getElementById('user-tag-display').innerText = userProfile.tag;
-            document.getElementById('user-avatar-display').src = userProfile.avatar;
+        window.renderProfile = function() {
+            document.getElementById('user-name-display').innerText = window.userProfile.name;
+            document.getElementById('user-tag-display').innerText = window.userProfile.tag;
+            document.getElementById('user-avatar-display').src = window.userProfile.avatar;
 
             const list = document.getElementById('profile-items-list');
-            const myProducts = products.filter(p => p.isMine);
+            const myProducts = window.products.filter(p => p.isMine);
             document.getElementById('stat-total').innerText = myProducts.length;
 
             if(myProducts.length === 0) { list.innerHTML = `<p style="grid-column:span 2; text-align:center; color:var(--secondary-text);">У вас ще немає товарів</p>`; return; }
@@ -417,7 +423,7 @@
         }
 
         // --- ЗАВАНТАЖЕННЯ ФОТО (Base64) ---
-        function previewImage(input, previewId, textId) {
+        window.previewImage = function(input, previewId, textId) {
             const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -433,7 +439,7 @@
         }
 
         // --- ЛОГІКА ДОДАВАННЯ ТОВАРУ ТА МОДАЛОК ---
-        function attemptSaveProduct() {
+        window.attemptSaveProduct = function() {
             const title = document.getElementById('p-title').value.trim();
             const price = document.getElementById('p-price').value.trim();
             const city = document.getElementById('p-city').value.trim();
@@ -441,83 +447,93 @@
             const imgData = imgInput.getAttribute('data-base64');
             
             if(!title || !price || !city || !imgData) { 
-                if(tg && tg.showAlert) tg.showAlert("Заповніть назву, ціну, місто та додайте фото!"); 
+                if(window.tg && window.tg.showAlert) window.tg.showAlert("Заповніть назву, ціну, місто та додайте фото!"); 
                 else alert("Заповніть назву, ціну, місто та додайте фото!"); 
                 return; 
             }
-
-            // Відкриваємо модалку реклами
             document.getElementById('ad-modal').classList.add('active');
         }
 
-        function handleAdChoice(wantAds) {
+        window.handleAdChoice = function(wantAds) {
             document.getElementById('ad-modal').classList.remove('active');
-            
-            // Зберігаємо товар у локальну "базу"
-            doFinalSave();
+            window.doFinalSave(); // Зберігаємо у Firebase
 
             if (wantAds) {
-                if(tg && tg.showAlert) tg.showAlert("Оплата реклами в розробці. Товар виставлено звичайно!");
+                if(window.tg && window.tg.showAlert) window.tg.showAlert("Оплата реклами в розробці. Товар виставлено звичайно!");
                 else alert("Оплата реклами в розробці. Товар виставлено звичайно!");
-                
-                showPage('profile-page', 'nav-profile');
+                window.showPage('profile-page', 'nav-profile');
             } else {
-                // Відкриваємо гарне вікно "Товар виставлений"
                 document.getElementById('success-modal').classList.add('active');
             }
         }
 
-        function closeSuccessModal() {
+        window.closeSuccessModal = function() {
             document.getElementById('success-modal').classList.remove('active');
-            showPage('profile-page', 'nav-profile');
+            window.showPage('profile-page', 'nav-profile');
         }
 
-        function doFinalSave() {
+        // --- ЗБЕРЕЖЕННЯ У FIREBASE ---
+        window.doFinalSave = async function() {
             const title = document.getElementById('p-title').value.trim();
             const price = document.getElementById('p-price').value.trim();
             const city = document.getElementById('p-city').value.trim();
             const category = document.getElementById('p-category').value;
+            const desc = document.getElementById('p-desc').value.trim();
             const imgInput = document.getElementById('p-img');
             const imgData = imgInput.getAttribute('data-base64');
 
-            // Зберігаємо (тепер він буде видимий і на головній, бо зберігається у загальний масив products)
-            products.unshift({
-                id: Date.now(), title, price, city, category, img: imgData, isMine: true,
-                views: Math.floor(Math.random() * 50) + 1,
-                likes: Math.floor(Math.random() * 10)
-            });
-            saveProductsToStorage();
+            try {
+                // Відправляємо дані у Firestore
+                await addDoc(collection(db, "products"), {
+                    title: title,
+                    price: price,
+                    city: city,
+                    category: category,
+                    description: desc,
+                    img: imgData,
+                    userId: window.userProfile.tag, // Прив'язка до юзернейма
+                    views: Math.floor(Math.random() * 50) + 1,
+                    likes: Math.floor(Math.random() * 10),
+                    timestamp: Date.now()
+                });
 
-            // Очистка форми
-            document.getElementById('p-title').value = ''; document.getElementById('p-price').value = '';
-            document.getElementById('p-city').value = ''; document.getElementById('p-desc').value = '';
-            imgInput.value = ''; imgInput.removeAttribute('data-base64');
-            document.getElementById('add-img-preview').style.display = 'none';
-            document.getElementById('add-img-text').style.display = 'block';
+                // Очистка форми
+                document.getElementById('p-title').value = ''; document.getElementById('p-price').value = '';
+                document.getElementById('p-city').value = ''; document.getElementById('p-desc').value = '';
+                imgInput.value = ''; imgInput.removeAttribute('data-base64');
+                document.getElementById('add-img-preview').style.display = 'none';
+                document.getElementById('add-img-text').style.display = 'block';
+            } catch (e) {
+                console.error("Помилка збереження товару: ", e);
+                alert("Сталася помилка при збереженні товару.");
+            }
         }
 
-        function loadProfileDataIntoForm() {
-            document.getElementById('u-name').value = userProfile.name;
-            document.getElementById('u-tag').value = userProfile.tag;
+        window.loadProfileDataIntoForm = function() {
+            document.getElementById('u-name').value = window.userProfile.name;
+            document.getElementById('u-tag').value = window.userProfile.tag;
             const preview = document.getElementById('edit-avatar-preview');
-            preview.src = userProfile.avatar;
+            preview.src = window.userProfile.avatar;
             preview.style.display = 'block';
             document.getElementById('edit-avatar-text').style.display = 'none';
-            document.getElementById('u-avatar').setAttribute('data-base64', userProfile.avatar);
+            document.getElementById('u-avatar').setAttribute('data-base64', window.userProfile.avatar);
         }
 
-        function saveProfile() {
-            userProfile.name = document.getElementById('u-name').value.trim();
-            userProfile.tag = document.getElementById('u-tag').value.trim();
-            userProfile.avatar = document.getElementById('u-avatar').getAttribute('data-base64') || userProfile.avatar;
+        window.saveProfile = function() {
+            window.userProfile.name = document.getElementById('u-name').value.trim();
+            window.userProfile.tag = document.getElementById('u-tag').value.trim();
+            window.userProfile.avatar = document.getElementById('u-avatar').getAttribute('data-base64') || window.userProfile.avatar;
             
-            localStorage.setItem('olx_user', JSON.stringify(userProfile));
-            if(tg && tg.showAlert) tg.showAlert("Профіль оновлено!");
-            showPage('profile-page', 'nav-profile');
+            localStorage.setItem('olx_user', JSON.stringify(window.userProfile));
+            if(window.tg && window.tg.showAlert) window.tg.showAlert("Профіль оновлено!");
+            window.showPage('profile-page', 'nav-profile');
+            
+            // Оновлюємо відображення товарів, бо змінився тег користувача
+            window.renderProducts();
         }
 
         // --- НАЛАШТУВАННЯ ТА ІНШЕ ---
-        function toggleTheme() {
+        window.toggleTheme = function() {
             const isDark = document.getElementById('theme-toggle').checked;
             if(isDark) {
                 document.body.classList.add('dark-mode');
@@ -528,13 +544,12 @@
             }
         }
 
-        function openSupport() {
-            // Оновлений лінк на @mertin1
-            if(tg && tg.openTelegramLink) tg.openTelegramLink('https://t.me/mertin1');
+        window.openSupport = function() {
+            if(window.tg && window.tg.openTelegramLink) window.tg.openTelegramLink('https://t.me/mertin1');
             else window.location.href = 'https://t.me/mertin1';
         }
 
-        // --- PULL TO REFRESH (Свайп вниз для оновлення) ---
+        // --- PULL TO REFRESH ---
         let startY = 0;
         const homePage = document.getElementById('home-page');
         const ptr = document.getElementById('ptr-indicator');
@@ -546,12 +561,36 @@
         }, {passive: true});
         homePage.addEventListener('touchend', () => {
             if(ptr.style.display === 'block') {
-                setTimeout(() => { ptr.style.display = 'none'; renderProducts(); }, 1000);
+                setTimeout(() => { ptr.style.display = 'none'; window.renderProducts(); }, 1000);
             }
         });
 
-        // Ініціалізація
-        window.onload = () => { renderProducts(); };
+        // --- СИНХРОНІЗАЦІЯ З FIREBASE (REAL-TIME) ---
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            const fetchedProducts = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                fetchedProducts.push({
+                    id: doc.id,
+                    ...data,
+                    // Товар належить поточному юзеру, якщо теги збігаються
+                    isMine: data.userId === window.userProfile.tag 
+                });
+            });
+
+            // Сортуємо: найновіші зверху
+            fetchedProducts.sort((a, b) => b.timestamp - a.timestamp);
+            window.products = fetchedProducts;
+            
+            // Оновлюємо поточну сторінку
+            if(document.getElementById('home-page').classList.contains('active')) window.renderProducts();
+            if(document.getElementById('profile-page').classList.contains('active')) window.renderProfile();
+        });
+
+        // Ініціалізація після завантаження
+        window.onload = () => { 
+            window.renderProducts(); 
+        };
     </script>
 </body>
 </html>
